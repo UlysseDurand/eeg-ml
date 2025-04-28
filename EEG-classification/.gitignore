@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+
+venv/
+env/
+*.env
+
+# Not to upload the dataset
+filtered_data/
+checkpoints/*
+!.gitkeep
