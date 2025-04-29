@@ -18,7 +18,7 @@ def plotEEG(eeg, channels = range(32), totalTime = 25, title=""):
     plt.show()
 
 def plotTimeFreqEEG(sample):
-    fig, axes = plt.subplots(32, 1)
+    fig, axes = plt.subplots(8, 4)
     axes = axes.flatten()
     
     for i, ax in enumerate(axes):

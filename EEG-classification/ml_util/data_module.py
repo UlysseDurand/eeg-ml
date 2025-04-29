@@ -47,3 +47,22 @@ def calculate_accuracy(predicted, real) -> float:
         if predicted[i] == real[i]:
             good += 1
     return good / len(predicted)
+
+def calculate_confusion_matrix(preds, real, nblabels: int):
+    res = np.zeros((nblabels, nblabels))
+    for i in range(len(preds)):
+        thepred = preds[i]
+        thereal = real[i]
+        res[thereal][thepred] += 1
+    return res
+
+def calculate_epoch(res):
+    train_pred, train_real = res["train_pred"], res["train_real"]
+    val_pred, val_real = res["val_pred"], res["val_real"]
+    nblabels = res["nblabels"]
+
+    res["train_acc"] = calculate_accuracy(train_pred, train_real)
+    res["val_acc"] = calculate_accuracy(val_pred, val_real)
+
+    res["train_confusion"] = calculate_confusion_matrix(train_pred, train_real, nblabels)
+    res["val_confusion"] = calculate_confusion_matrix(val_pred, val_real, nblabels)

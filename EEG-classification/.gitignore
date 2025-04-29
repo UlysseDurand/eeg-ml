@@ -9,4 +9,5 @@ env/
 # Not to upload the dataset
 filtered_data/
 checkpoints/*
+wandb/
 !.gitkeep
