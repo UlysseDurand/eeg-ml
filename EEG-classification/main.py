@@ -4,7 +4,15 @@
 # In[1]:
 
 
+# Define the verbose variable
 verbose = False
+
+# Check if we're running in a Jupyter Notebook (not compiled script)
+try:
+    __IPYTHON__
+    verbose = True  # Set verbose to True if running in a Jupyter Notebook
+except NameError:
+    pass  # Do nothing if we're not in a notebook
 
 
 # In[2]:
@@ -31,6 +39,7 @@ from ml_util.logger import WandBReporter, print_stats
 # In[3]:
 
 
+print("Loading raw dataset")
 X_raw, y = checkpoint(lambda: get_data(verbose=True), "raw_input")
 
 
@@ -46,6 +55,7 @@ if verbose:
 
 
 # Applies preprocessing
+print("Preprocessing input data")
 X = checkpoint(lambda : preprocess_dataset(X_raw, verbose=True), "preprocessed")
 print(f"Input dataset shape: {X.shape}")
 

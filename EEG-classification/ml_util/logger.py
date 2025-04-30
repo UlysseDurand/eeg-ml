@@ -10,7 +10,8 @@ with open("config.json") as f:
     cfg = json.load(f)
 
 class WandBReporter():
-    def __init__(self, hyperparameters):
+    def __init__(self, hyperparameters, labelList):
+        self.labelList = labelList
         wandb.login(key=os.environ.get("WANDB_API_KEY"))
         self.run = wandb.init(
             project=cfg.get("project", "project"),
@@ -18,11 +19,15 @@ class WandBReporter():
         )
 
     def __call__(self, res):
+        val_preds, val_labels = res["val_confusion"]
+        val_preds = val_preds.cpu().numpy().tolist()
+        val_labels = val_labels.cpu().numpy().tolist()
         self.run.log({
             "train/loss": res["train_loss"],
             "val/loss": res["val_loss"],
             "train/acc": res["train_acc"],
-            "val/acc" : res["val_acc"]
+            "val/acc" : res["val_acc"],
+            "val/conf_mat": wandb.plot.confusion_matrix(preds=val_preds, y_true=val_labels, class_names=self.labelList)
         })
 
 def print_stats(res):

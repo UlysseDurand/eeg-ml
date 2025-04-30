@@ -40,8 +40,10 @@ class GoodClassificationModel():
         x, y = x.to(self.device), y.to(self.device)
         scores = self.model(x)
         loss = self.loss(scores, y)
+
         self.train_acc.update(scores, y)
         self.log("train_loss", (loss, len(batch)))
+
         return loss
 
     def validation_step(self, batch):
@@ -51,7 +53,10 @@ class GoodClassificationModel():
             x, y = x.to(self.device), y.to(self.device)
             scores = self.model(x)
             loss = self.loss(scores, y)
+
             self.val_acc.update(scores, y)
+            self.log("val_preds", torch.argmax(scores, dim=1))
+            self.log("val_labels", y)
             self.log("val_loss", (loss, len(batch)))
 
     def epoch_end_callback(self):
@@ -73,10 +78,18 @@ class GoodClassificationModel():
         res["val_loss"] = self.calculate_loss("val_loss")
         res["train_acc"] = self.train_acc.compute()
         res["val_acc"] = self.val_acc.compute()
+        res["val_confusion"] = self.calculate_confusion("val_preds", "val_labels")
         return res
+    
+    def calculate_confusion(self, keypreds, keylabels):
+        if keypreds in self.epoch_log and keylabels in self.epoch_log:
+            preds = torch.cat(self.epoch_log[keypreds])
+            labels = torch.cat(self.epoch_log[keylabels])
+            return preds, labels
+        else:
+            raise RuntimeError(f"{keypreds} or {keylabels} not logged during epoch calculation")
 
     def calculate_loss(self, key):
-        res = None
         if key in self.epoch_log:
             res = 0
             total = 0
@@ -85,7 +98,7 @@ class GoodClassificationModel():
                 total = b
             return res / total
         else:
-            raise RuntimeError(f"{key} loss not logged during epoch calculation")
+            raise RuntimeError(f"{key} not logged during epoch calculation")
     
     def configure_optimizer(self):
         return torch.optim.Adam(self.model.parameters(), lr=self.hyperparameters["lr"], weight_decay=self.hyperparameters['weight_decay'])
