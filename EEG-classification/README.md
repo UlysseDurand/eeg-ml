@@ -24,8 +24,10 @@ pip install -r requirements.txt
 Extract the `filtered_data` folder here.
 
 5. For Weights & Biases usage:
+
+Put your API key in the .env file, it should look like this
 ```
-wandb login
+WANDB_API_KEY=your_api_key
 ```
 
 ## Usage

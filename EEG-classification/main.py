@@ -1,4 +1,14 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# In[1]:
+
+
 verbose = False
+
+
+# In[2]:
+
 
 # All the imports
 
@@ -13,15 +23,27 @@ import bigmodel
 
 from ml_util.eeg_util import plotEEG, plotTimeFreqEEG
 from ml_util.checkpoint import checkpoint
-from ml_util.data_module import DataModule, calculate_accuracy
-from ml_util.trainer import Trainer
-from ml_util.report_wandb import WandBReporter, print_stats
+from ml_util.data_module import DataModule
+from ml_util.trainer import GoodClassificationModel, GoodTrainer
+from ml_util.logger import WandBReporter, print_stats
 
-X_raw, y = get_data(verbose=True)
+
+# In[3]:
+
+
+X_raw, y = checkpoint(lambda: get_data(verbose=True), "raw_input")
+
+
+# In[4]:
+
 
 if verbose:
     plotEEG(X_raw[0], title="index 0")
     print(labelList[y[0]])
+
+
+# In[5]:
+
 
 # Applies preprocessing
 X = checkpoint(lambda : preprocess_dataset(X_raw, verbose=True), "preprocessed")
@@ -29,6 +51,14 @@ print(f"Input dataset shape: {X.shape}")
 
 # Stores in a TensorDataset
 dataset = DataModule(X, y)
+
+# Uncomment to try overfitting
+# dataset = dataset.get_part(0.25)
+
+
+# In[6]:
+
+
 if verbose:
     for label in range(4):
         sampleId = torch.where(y==label)[0][0]
@@ -39,29 +69,34 @@ if verbose:
     plt.show()
 
 
+# In[7]:
+
+
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("GPU" if torch.cuda.is_available() else "CPU")
 
 hyperparams = {
-    'lr': 4e-3,
-    'weight_decay': 0,
+    'lr': 1e-3,
+    'weight_decay': 5e-3,
     'batch_size': 16
 }
 model = bigmodel.model(X[0])
 loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=hyperparams['lr'], weight_decay=hyperparams['weight_decay'])
 
-trainer = Trainer(model, optimizer, loss_fn, hyperparams, device)
+classification_model = GoodClassificationModel(model, loss_fn, hyperparams, device, 4)
+trainer = GoodTrainer()
 
-def babysitter(hyperparameters, epoch_results):
-    hyperparameters['lr'] = 0.9 * hyperparameters['lr']
+def babysitter(goodModel):
+    if (goodModel.epoch %  10 == 0):
+        goodModel.hyperparameters['lr'] = 0.8 * goodModel.hyperparameters['lr']
 
-wandbreporter = WandBReporter(hyperparams)
-def report(res):
-    print_stats(res)
-    wandbreporter.report(res)
+trainer.add_babysitter(babysitter)
+trainer.add_logger(print_stats)
+trainer.add_logger(WandBReporter(hyperparams))
 
-trainer.set_report_callback(report)
-trainer.set_babysitting_callback(babysitter)
 
-trainer.train(dataset, 1000)
+# In[ ]:
+
+
+trainer.train(classification_model, dataset, 1000)
+

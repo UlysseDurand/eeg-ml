@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-from typing import Callable
+from typing import Callable, Any
 from torch.utils.data import DataLoader
 
 def normalize_tensor(tensor: torch.Tensor) -> torch.Tensor:
@@ -14,7 +14,12 @@ def normalize_tensor(tensor: torch.Tensor) -> torch.Tensor:
     normalized_tensor = (tensor - mean) / std
     return normalized_tensor
 
-def apply_function_to_tensor(f: Callable[[torch.Tensor], torch.Tensor], X: torch.tensor, batch_size=32, verbose=False):
+def apply_function_to_tensor(
+        f: Callable[[torch.Tensor], Any], 
+        X: torch.tensor, 
+        reconstruct=lambda ress : torch.cat(ress,dim=0), 
+        batch_size=32, verbose=False
+    ):
     '''
     f is a function from a tensor to a tensor, it is meant to be used with the whole dataset
     This function makes it applied to batches that are then concatenated
@@ -31,5 +36,4 @@ def apply_function_to_tensor(f: Callable[[torch.Tensor], torch.Tensor], X: torch
         for inputs in the_tqdm(dataloader, desc="Batch function apply"):
             out = f(inputs)
             all_outputs.append(out.cpu())
-        all_outputs = torch.cat(all_outputs, dim=0)
-        return all_outputs
+        return reconstruct(all_outputs)

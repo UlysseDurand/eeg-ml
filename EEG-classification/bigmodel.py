@@ -10,18 +10,18 @@ def model(x_example):
 
     return nn.Sequential(
         nn.BatchNorm2d(channels),
-        nn.Conv2d(channels, channels, kernel_size=5, padding=1),  # (B,channels,h,w) → (B,channels,h,w)
-        nn.Dropout2d(0.5),
+        nn.Conv2d(channels, channels, kernel_size=5, padding=1),  # (B,channels,h,w) → (B,channels,h-2,w-2)
+        nn.Dropout2d(0.2),
         nn.BatchNorm2d(channels),
         nn.ReLU(),
 
         nn.Conv2d(channels, channels, kernel_size=3, padding=0),  # (B,channels,h-2,w-2) → (B,channels,h-4,w-4)
-        nn.Dropout2d(0.5),
+        nn.Dropout2d(0.2),
         nn.BatchNorm2d(channels),
         nn.ReLU(),
 
         nn.Conv2d(channels, channels_2, kernel_size=11, padding=5), # (B, channels,h-4,w-4) → (B, channels_2,h-4,w-4) 
-        nn.Dropout(0.5),
+        nn.Dropout(0.2),
         nn.BatchNorm2d(channels_2),
 
         nn.Flatten(),

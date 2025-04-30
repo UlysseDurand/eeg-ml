@@ -1,5 +1,4 @@
 {
 	"checkpoint_dir": "checkpoints",
-	"entity": "ulysse-durand-ens-de-lyon",
 	"project": "EEG Classification"
 }

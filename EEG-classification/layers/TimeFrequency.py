@@ -19,12 +19,12 @@ class TimeFrequency(nn.Module):
 
         n_fft = input_example[0].shape[0]
 
-        bands = []
-        deltafreq = fs / hop_length
-        nbbands = int((fs / 2) / deltafreq)
+        # bands = []
+        # deltafreq = fs / hop_length
+        # nbbands = int((fs / 2) / deltafreq)
 
-        for i in range(nbbands):
-            bands.append((i*deltafreq, (i+1)*deltafreq))
+        # for i in range(nbbands):
+        #     bands.append((i*deltafreq, (i+1)*deltafreq))
 
         self.n_fft, self.hop_length = n_fft, hop_length
         freqs = torch.fft.rfftfreq(n_fft, 1/fs)

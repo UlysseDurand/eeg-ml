@@ -1,7 +1,11 @@
-notebook==7.4.1
-ipywidgets==8.1.6
+dotenv==0.9.9
+notebook==6.5.4
+traitlets==5.9.0
+ipython==8.12.0
+jupyter_contrib_nbextensions==0.7.0
 matplotlib==3.10.1
 torch==2.7.0
 tqdm==4.67.1
 scipy==1.15.2
 wandb==0.19.10
+torchmetrics==1.7.1

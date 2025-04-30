@@ -1,6 +1,6 @@
 import torch
-from torch.utils.data import DataLoader, random_split
-from torch.utils.data import TensorDataset
+from torch.utils.data import random_split
+from torch.utils.data import TensorDataset, Dataset
 import numpy as np
 from typing import Callable
 
@@ -11,9 +11,7 @@ class DataModule():
     MyDataModule.test_dataset is the testing dataset
     '''
 
-    def __init__(self, X: torch.Tensor, y: torch.Tensor, batch_size=32, val_part=0.15, test_part=0.15):
-        super().__init__()
-        self.batch_size = batch_size
+    def __init__(self, X: torch.Tensor, y: torch.Tensor, val_part=0.15, test_part=0.15):
         self.whole_dataset = TensorDataset(X, y)
         self.val_part = val_part
         self.test_part = test_part
@@ -24,21 +22,29 @@ class DataModule():
         self.test_len = int(self.test_part * len(self.whole_dataset))
         self.train_len = len(self.whole_dataset) - self.test_len - self.val_len
 
-        self.train_dataset, self.val_dataset, self.test_dataset = random_split(self.whole_dataset, [self.train_len, self.val_len, self.test_len])
+        X, y = self.whole_dataset.tensors
 
-    def evaluate_classification_model(self, model : Callable[[torch.Tensor], int], verbose=False):
-        '''
-        Evaluating the model on the test dataset
-        '''
-        predicted_Y = []
-        real_Y = []
-        for (x, y) in self.test_dataset:
-            predicted_Y += model(x).argmax(dim=1)
-            real_Y += y
+        train_sub, val_sub, test_sub = random_split(self.whole_dataset, [self.train_len, self.val_len, self.test_len])
+        self.train_dataset = TensorDataset(X[train_sub.indices], y[train_sub.indices])
+        self.val_dataset = TensorDataset(X[val_sub.indices], y[val_sub.indices])
+        self.test_dataset = TensorDataset(X[test_sub.indices], y[test_sub.indices])
 
-        test_acc = calculate_accuracy(predicted_Y, real_Y)
-        print()
-        return predicted_Y
+    def get_part(self, part):
+        indices = get_part_indices(self.whole_dataset, part)
+        X, y = self.whole_dataset.tensors
+        newX = X[indices]
+        newy = y[indices]
+        return DataModule(newX, newy, self.val_part, self.test_part)
+
+class ClassificationDataModule(DataModule):
+    def __init__(self, X: torch.Tensor, y: torch.Tensor, val_part=0.15, test_part=0.15):
+        super.__init__(X, y, val_part, test_part)
+        self.train_metrics
+
+def get_part_indices(dataset: Dataset, part):
+    # Returns a random smaller dataset of size part*len(self.whole_dataset)
+    subset, _ = random_split(dataset, [part, 1-part])
+    return subset.indices
 
 def calculate_accuracy(predicted, real) -> float:
     assert len(predicted) == len(real)
@@ -48,21 +54,29 @@ def calculate_accuracy(predicted, real) -> float:
             good += 1
     return good / len(predicted)
 
+def evaluate_classification_model(dataset: TensorDataset, model : Callable[[torch.Tensor], int], verbose=False):
+    '''
+    Evaluating the model on the test dataset
+    '''
+    X, y = dataset.tensors
+    predicted_Y = model(X).argmax(dim=1)
+    return predicted_Y, y
+
 def calculate_confusion_matrix(preds, real, nblabels: int):
     res = np.zeros((nblabels, nblabels))
-    for i in range(len(preds)):
-        thepred = preds[i]
-        thereal = real[i]
-        res[thereal][thepred] += 1
+    # for i in range(len(preds)):
+    #     thepred = preds[i]
+    #     thereal = real[i]
+    #     res[thereal][thepred] += 1
     return res
 
 def calculate_epoch(res):
-    train_pred, train_real = res["train_pred"], res["train_real"]
-    val_pred, val_real = res["val_pred"], res["val_real"]
-    nblabels = res["nblabels"]
+    pass
+    # train_pred, train_real = res["train_pred"], res["train_real"]
+    # val_pred, val_real = res["val_pred"], res["val_real"]
 
-    res["train_acc"] = calculate_accuracy(train_pred, train_real)
-    res["val_acc"] = calculate_accuracy(val_pred, val_real)
+    # res["train_acc"] = calculate_accuracy(train_pred, train_real)
+    # res["val_acc"] = calculate_accuracy(val_pred, val_real)
 
-    res["train_confusion"] = calculate_confusion_matrix(train_pred, train_real, nblabels)
-    res["val_confusion"] = calculate_confusion_matrix(val_pred, val_real, nblabels)
+    # res["train_confusion"] = calculate_confusion_matrix(train_pred, train_real, nblabels)
+    # res["val_confusion"] = calculate_confusion_matrix(val_pred, val_real, nblabels)
