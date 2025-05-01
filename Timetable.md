@@ -20,4 +20,6 @@ I didn't finish all the course, I had watched 3/4 of the course and completed 1.
 
 # Second week (28/4 - )
 
-- 
+- More registration
+- Making my "own" machine learning framework (on top of pytorch, torchmetrics, wandb)
+- Participation in "brain exercice game"

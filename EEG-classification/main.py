@@ -36,6 +36,9 @@ from ml_util.trainer import GoodClassificationModel, GoodTrainer
 from ml_util.logger import WandBReporter, print_stats
 
 
+torch.manual_seed(42)
+
+
 # In[3]:
 
 
@@ -63,7 +66,7 @@ print(f"Input dataset shape: {X.shape}")
 dataset = DataModule(X, y)
 
 # Uncomment to try overfitting
-# dataset = dataset.get_part(0.25)
+#dataset = dataset.get_part(0.25)
 
 
 # In[6]:
@@ -87,7 +90,7 @@ print("GPU" if torch.cuda.is_available() else "CPU")
 
 hyperparams = {
     'lr': 1e-3,
-    'weight_decay': 5e-3,
+    'weight_decay': 5e-2,
     'batch_size': 16
 }
 model = bigmodel.model(X[0])
@@ -98,14 +101,14 @@ trainer = GoodTrainer()
 
 def babysitter(goodModel):
     if (goodModel.epoch %  10 == 0):
-        goodModel.hyperparameters['lr'] = 0.8 * goodModel.hyperparameters['lr']
+        goodModel.hyperparameters['lr'] = 0.9 * goodModel.hyperparameters['lr']
 
 trainer.add_babysitter(babysitter)
 trainer.add_logger(print_stats)
-trainer.add_logger(WandBReporter(hyperparams))
+trainer.add_logger(WandBReporter(hyperparams, labelList))
 
 
-# In[ ]:
+# In[8]:
 
 
 trainer.train(classification_model, dataset, 1000)

@@ -36,11 +36,6 @@ class DataModule():
         newy = y[indices]
         return DataModule(newX, newy, self.val_part, self.test_part)
 
-class ClassificationDataModule(DataModule):
-    def __init__(self, X: torch.Tensor, y: torch.Tensor, val_part=0.15, test_part=0.15):
-        super.__init__(X, y, val_part, test_part)
-        self.train_metrics
-
 def get_part_indices(dataset: Dataset, part):
     # Returns a random smaller dataset of size part*len(self.whole_dataset)
     subset, _ = random_split(dataset, [part, 1-part])
@@ -53,30 +48,3 @@ def calculate_accuracy(predicted, real) -> float:
         if predicted[i] == real[i]:
             good += 1
     return good / len(predicted)
-
-def evaluate_classification_model(dataset: TensorDataset, model : Callable[[torch.Tensor], int], verbose=False):
-    '''
-    Evaluating the model on the test dataset
-    '''
-    X, y = dataset.tensors
-    predicted_Y = model(X).argmax(dim=1)
-    return predicted_Y, y
-
-def calculate_confusion_matrix(preds, real, nblabels: int):
-    res = np.zeros((nblabels, nblabels))
-    # for i in range(len(preds)):
-    #     thepred = preds[i]
-    #     thereal = real[i]
-    #     res[thereal][thepred] += 1
-    return res
-
-def calculate_epoch(res):
-    pass
-    # train_pred, train_real = res["train_pred"], res["train_real"]
-    # val_pred, val_real = res["val_pred"], res["val_real"]
-
-    # res["train_acc"] = calculate_accuracy(train_pred, train_real)
-    # res["val_acc"] = calculate_accuracy(val_pred, val_real)
-
-    # res["train_confusion"] = calculate_confusion_matrix(train_pred, train_real, nblabels)
-    # res["val_confusion"] = calculate_confusion_matrix(val_pred, val_real, nblabels)

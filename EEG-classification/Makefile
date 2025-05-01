@@ -1,15 +1,19 @@
-execute: makescript run
+.PHONY: venv run clean_checkpoint clean install notebook 
 
-makescript:
-	jupyter nbconvert --to script main.ipynb
+run: main.py
+	. venv/bin/activate && python main.py
 
-run:
-	python main.py
+main.py:
+	. venv/bin/activate && jupyter nbconvert --to script main.ipynb
 
 notebook:
-	jupyter notebook
+	. venv/bin/activate && jupyter notebook
 
-no_checkpoint:
+install:
+	python -m venv venv
+	. venv/bin/activate && pip install -r requirements.txt
+
+clean_checkpoint:
 	rm -f -- checkpoints/*
 
 clean:

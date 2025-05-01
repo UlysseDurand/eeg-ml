@@ -4,8 +4,6 @@ from typing import Callable, List, Tuple, Dict, Any
 from torch.utils.data import DataLoader
 from torchmetrics.classification import Accuracy
 
-from ml_util.data_module import DataModule, evaluate_classification_model
-
 class GoodClassificationModel():
     def __init__(self, 
                  model: nn.Module, 
@@ -46,7 +44,8 @@ class GoodClassificationModel():
 
         return loss
 
-    def validation_step(self, batch):
+    def validation_step(self, batch, val=True):
+        keyword = "val" if val else "test"
         self.model.eval()
         with torch.no_grad():
             x, y = batch
@@ -55,9 +54,9 @@ class GoodClassificationModel():
             loss = self.loss(scores, y)
 
             self.val_acc.update(scores, y)
-            self.log("val_preds", torch.argmax(scores, dim=1))
-            self.log("val_labels", y)
-            self.log("val_loss", (loss, len(batch)))
+            self.log(f"{keyword}_preds", torch.argmax(scores, dim=1))
+            self.log(f"{keyword}_labels", y)
+            self.log(f"{keyword}_loss", (loss, len(batch)))
 
     def epoch_end_callback(self):
         self.epoch += 1
@@ -95,7 +94,7 @@ class GoodClassificationModel():
             total = 0
             for a, b in self.epoch_log[key]:
                 res += a * b
-                total = b
+                total += b
             return res / total
         else:
             raise RuntimeError(f"{key} not logged during epoch calculation")
