@@ -92,7 +92,7 @@ print("GPU" if torch.cuda.is_available() else "CPU")
 
 hyperparams |= {
     'lr': 1e-4,
-    'weight_decay': 2e-4,
+    'weight_decay': 2e-2,
     'batch_size': 512
 }
 model = bigmodel.model(X[0], hyperparams)
@@ -105,7 +105,7 @@ def babysitter(goodModel):
     if (goodModel.epoch %  10 == 0):
         goodModel.hyperparameters['lr'] = 0.99 * goodModel.hyperparameters['lr']
 
-# trainer.add_babysitter(babysitter)
+trainer.add_babysitter(babysitter)
 trainer.add_logger(lambda res: print_stats(res, print_every=10))
 trainer.add_logger(WandBReporter(hyperparams, labelList, model))
 
@@ -113,7 +113,7 @@ trainer.add_logger(WandBReporter(hyperparams, labelList, model))
 # In[ ]:
 
 
-trainer.train(classification_model, dataset, 30000)
+trainer.train(classification_model, dataset, 1500)
 
 
 # In[ ]:
