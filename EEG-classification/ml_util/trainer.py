@@ -21,8 +21,8 @@ class GoodClassificationModel():
         self.device = device
         self.nblabels = nblabels
 
-        self.train_acc  = Accuracy("multiclass", num_classes=nblabels)
-        self.val_acc    = Accuracy("multiclass", num_classes=nblabels)
+        self.train_acc  = Accuracy("multiclass", num_classes=nblabels).to(device)
+        self.val_acc    = Accuracy("multiclass", num_classes=nblabels).to(device)
         self.epoch_log = {}
         self.epoch = 0
 

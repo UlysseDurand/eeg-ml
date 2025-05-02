@@ -33,5 +33,6 @@ class WandBReporter():
         #     "val/conf_mat": wandb.plot.confusion_matrix(preds=val_preds, y_true=val_labels, class_names=self.labelList)
         # )
 
-def print_stats(res):
-    print(f"Epoch:{res['epoch']:>5}    | tl: {res['train_loss']:2f}, ta: {res['train_acc']:2f}    |    vl: {res['val_loss']:2f}, va: {res['val_acc']:2f}")
+def print_stats(res, print_every=1):
+    if (res['epoch'] % print_every == 0):
+        print(f"Epoch:{res['epoch']:>5}    | tl: {res['train_loss']:2f}, ta: {res['train_acc']:2f}    |    vl: {res['val_loss']:2f}, va: {res['val_acc']:2f}")
