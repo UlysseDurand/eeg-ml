@@ -10,7 +10,8 @@ matplotlib==3.10.1
 tqdm==4.67.1
 
 # To run ML
-torch==2.7.0
-torchmetrics==1.7.1
+numpy==1.26.4
+torchmetrics==0.10.3
 scipy==1.15.2
+scikit_learn==1.6.1
 wandb==0.19.10

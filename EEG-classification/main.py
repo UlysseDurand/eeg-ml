@@ -91,7 +91,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("GPU" if torch.cuda.is_available() else "CPU")
 
 hyperparams |= {
-    'lr': 7e-4,
+    'lr': 2e-4,
     'weight_decay': 2e-4,
     'batch_size': 16
 }
@@ -107,7 +107,7 @@ def babysitter(goodModel):
 
 trainer.add_babysitter(babysitter)
 trainer.add_logger(print_stats)
-trainer.add_logger(WandBReporter(hyperparams, labelList))
+trainer.add_logger(WandBReporter(hyperparams, labelList, model))
 
 
 # In[ ]:

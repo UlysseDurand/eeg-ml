@@ -34,4 +34,4 @@ class WandBReporter():
         # )
 
 def print_stats(res):
-    print(f"Epoch:{res["epoch"]:>5}    | tl: {res["train_loss"]:2f}, ta: {res["train_acc"]:2f}    |    vl: {res["val_loss"]:2f}, va: {res["val_acc"]:2f}")
+    print(f"Epoch:{res['epoch']:>5}    | tl: {res['train_loss']:2f}, ta: {res['train_acc']:2f}    |    vl: {res['val_loss']:2f}, va: {res['val_acc']:2f}")
