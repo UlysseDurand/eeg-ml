@@ -6,13 +6,16 @@ run: main.py dataset/filtered_data
 	. venv/bin/activate && python main.py
 
 dataset/Data.rar:
-	cd dataset && python dl_dataset_1.py
+	@echo "Downloading dataset..."
+	@cd dataset && python dl_dataset_1.py
+	@echo "Now please extract filtered_data from dataset/Data.rar to dataset/filtered_data"
 
 main.py: main.ipynb
-	. venv/bin/activate && jupyter nbconvert --to script main.ipynb
+	@echo "Converting notebook to script..."
+	@. venv/bin/activate && jupyter nbconvert --to script main.ipynb
 
 notebook: dataset/filtered_data
-	. venv/bin/activate && jupyter notebook
+	@. venv/bin/activate && jupyter notebook
 
 install:
 	@echo "Installation of virtual enviroment"
@@ -25,7 +28,8 @@ install:
 		echo "No NVIDIA GPU detected. Installing CPU-only version of PyTorch..."; \
 		venv/bin/pip install torch==1.13.1 torchvision==0.14.1 torchaudio==0.13.1; \
 	fi
-	. venv/bin/activate && venv/bin/pip install -r requirements.txt
+	@echo "Installing requirements"
+	@. venv/bin/activate && venv/bin/pip install -r requirements.txt
 
 clean_checkpoint:
 	rm -f -- checkpoints/*
