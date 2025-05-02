@@ -1,7 +1,7 @@
 import torch
 
 from ml_util.data_processing import normalize_tensor, apply_function_to_tensor
-from layers.TimeFrequency import TimeFrequency
+from the_ml.TimeFrequency import TimeFrequency
 
 def getbands(bandsparam, fs):
 	if (bandsparam == "five"):

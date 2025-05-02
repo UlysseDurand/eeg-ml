@@ -1,11 +1,16 @@
+# To use the WandB API key
 dotenv==0.9.9
+
+# To display figures
 notebook==6.5.4
 traitlets==5.9.0
 ipython==8.12.0
 jupyter_contrib_nbextensions==0.7.0
 matplotlib==3.10.1
-torch==2.7.0
 tqdm==4.67.1
+
+# To run ML
+torch==2.7.0
+torchmetrics==1.7.1
 scipy==1.15.2
 wandb==0.19.10
-torchmetrics==1.7.1

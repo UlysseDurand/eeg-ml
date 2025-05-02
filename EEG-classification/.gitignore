@@ -7,7 +7,9 @@ env/
 *.env
 
 # Not to upload the dataset
-filtered_data/
+dataset/filtered_data/
+dataset/Data.rar
+
 checkpoints/*
 wandb/
 !.gitkeep

@@ -8,7 +8,7 @@ labelList = ['Arithmetic', 'Mirror_image', 'Relax', 'Stroop']
 nbSubjects = 40
 nbTrials = 3
 
-def get_sample(task, subjectId, trialNb, folder='filtered_data'):
+def get_sample(task, subjectId, trialNb, folder='dataset/filtered_data'):
     '''Retrieves one sample from the data folder''' 
     assert (task in labelList)
     assert (0 < subjectId <= nbSubjects)
@@ -16,7 +16,7 @@ def get_sample(task, subjectId, trialNb, folder='filtered_data'):
 
     return loadmat(folder+'/'+task+'_sub_'+str(subjectId)+'_trial'+str(trialNb)+'.mat')['Clean_data']
 
-def get_data(data_folder='filtered_data', verbose=False, device=torch.device("cpu")) -> tuple[torch.Tensor, torch.Tensor]:
+def get_data(data_folder='dataset/filtered_data', verbose=False, device=torch.device("cpu")) -> tuple[torch.Tensor, torch.Tensor]:
 
     if not(os.path.isdir(data_folder)): raise FileNotFoundError(f"Folder '{data_folder}' not found, the dataset is the `filtered_data` folder from https://figshare.com/articles/dataset/SAM_40_Dataset_of_40_Subject_EEG_Recordings_to_Monitor_the_Induced-Stress_while_performing_Stroop_Color-Word_Test_Arithmetic_Task_and_Mirror_Image_Recognition_Task/14562090/1?file=27956376")
 

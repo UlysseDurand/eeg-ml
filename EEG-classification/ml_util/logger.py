@@ -9,13 +9,15 @@ with open("config.json") as f:
     cfg = json.load(f)
 
 class WandBReporter():
-    def __init__(self, hyperparameters, labelList):
+    def __init__(self, hyperparameters, labelList, model):
         self.labelList = labelList
         wandb.login(key=os.environ.get("WANDB_API_KEY"))
         self.run = wandb.init(
             project=cfg.get("project", "project"),
             config=hyperparameters
         )
+        self.run.watch(model)
+
 
     def __call__(self, res):
         val_preds, val_labels = res["val_confusion"]
