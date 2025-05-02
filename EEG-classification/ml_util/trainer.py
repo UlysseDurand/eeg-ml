@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from typing import Callable, List, Tuple, Dict, Any
 from torch.utils.data import DataLoader
-from torchmetrics.classification import Accuracy
+from ml_util.data_module import calculate_accuracy
 
 class GoodClassificationModel():
     def __init__(self, 
@@ -20,15 +20,10 @@ class GoodClassificationModel():
         self.hyperparameters = hyperparameters
         self.device = device
         self.nblabels = nblabels
-
-        self.train_acc  = Accuracy("multiclass", num_classes=nblabels).to(device)
-        self.val_acc    = Accuracy("multiclass", num_classes=nblabels).to(device)
         self.epoch_log = {}
         self.epoch = 0
 
     def epoch_begin_callback(self):
-        self.train_acc.reset()
-        self.val_acc.reset()
         self.epoch_log = {}
 
     def training_step(self, batch):
@@ -39,13 +34,14 @@ class GoodClassificationModel():
         scores = self.model(x)
         loss = self.loss(scores, y)
 
-        self.train_acc.update(scores, y)
+        self.log("train_preds", torch.argmax(scores, dim=1))
+        self.log("train_labels", y)
         self.log("train_loss", (loss, len(batch)))
 
         return loss
 
-    def validation_step(self, batch, val=True):
-        keyword = "val" if val else "test"
+    def validation_step(self, batch, train=True):
+        keyword = "val" if train else "test"
         self.model.eval()
         with torch.no_grad():
             x, y = batch
@@ -53,13 +49,14 @@ class GoodClassificationModel():
             scores = self.model(x)
             loss = self.loss(scores, y)
 
-            self.val_acc.update(scores, y)
             self.log(f"{keyword}_preds", torch.argmax(scores, dim=1))
             self.log(f"{keyword}_labels", y)
             self.log(f"{keyword}_loss", (loss, len(batch)))
+            self.log("num_classes", scores.shape[1])
 
-    def epoch_end_callback(self):
-        self.epoch += 1
+    def epoch_end_callback(self, train):
+        if train:
+            self.epoch += 1
 
     def log(self, key, value):
         '''
@@ -73,14 +70,18 @@ class GoodClassificationModel():
     def epoch_results(self):
         res = {}
         res["epoch"] = self.epoch
-        res["train_loss"] = self.calculate_loss("train_loss")
-        res["val_loss"] = self.calculate_loss("val_loss")
-        res["train_acc"] = self.train_acc.compute()
-        res["val_acc"] = self.val_acc.compute()
-        res["val_confusion"] = self.calculate_confusion("val_preds", "val_labels")
+        res["num_classes"] = self.epoch_log["num_classes"][0]
+
+        for part in ["train", "val", "test"]:
+            if f"{part}_loss" in self.epoch_log: res[f"{part}_loss"] = self.calculate_loss(f"{part}_loss") 
+            if f"{part}_preds" in self.epoch_log and f"{part}_labels" in self.epoch_log: 
+                concat_preds, concat_labels = self.concat_all_preds_labels(f"{part}_preds", f"{part}_labels")
+                res[f"{part}_acc"] = calculate_accuracy(concat_preds, concat_labels)
+            if f"{part}_preds" in self.epoch_log and f"{part}_labels" in self.epoch_log:
+                res[f"{part}_confusion"] = self.concat_all_preds_labels(f"{part}_preds", f"{part}_labels")
         return res
     
-    def calculate_confusion(self, keypreds, keylabels):
+    def concat_all_preds_labels(self, keypreds, keylabels):
         if keypreds in self.epoch_log and keylabels in self.epoch_log:
             preds = torch.cat(self.epoch_log[keypreds])
             labels = torch.cat(self.epoch_log[keylabels])
@@ -129,9 +130,9 @@ class GoodTrainer:
 
             val_dataloader = DataLoader(dataset.val_dataset, batch_size)
             for batch in val_dataloader:
-                goodModel.validation_step(batch)
+                goodModel.validation_step(batch, train=True)
 
-            goodModel.epoch_end_callback()
+            goodModel.epoch_end_callback(train=True)
 
             # logs the epoch results
             epoch_results = goodModel.epoch_results()

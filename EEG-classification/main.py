@@ -33,7 +33,9 @@ from ml_util.eeg_util import plotEEG, plotTimeFreqEEG
 from ml_util.checkpoint import checkpoint
 from ml_util.data_module import DataModule
 from ml_util.trainer import GoodClassificationModel, GoodTrainer
-from ml_util.logger import WandBReporter, print_stats
+from ml_util.logger import WandBLogger, print_stats
+from ml_util.reporter import getTestResults
+from ml_util.plot import plot_confusion_matrix
 
 # To make it reproducible
 torch.manual_seed(42)
@@ -44,7 +46,17 @@ torch.manual_seed(42)
 
 print("Loading raw dataset")
 X_raw, y = checkpoint(lambda: get_data(verbose=True), "raw_input")
+print(f"Raw input dataset size: {X_raw.shape}")
 
+
+# # The SAM40 Dataset
+# 
+# It consists of electroencephalograms (EEG) of people while they perform tasks.
+# 
+# You can find the dataset [here](https://figshare.com/articles/dataset/SAM_40_Dataset_of_40_Subject_EEG_Recordings_to_Monitor_the_Induced-Stress_while_performing_Stroop_Color-Word_Test_Arithmetic_Task_and_Mirror_Image_Recognition_Task/14562090)
+# 
+# We extract the dataset to obtain 480 samples (120 for each task among Stroop, Relax, Mirror_Image, and Arithmetic).
+# Each sample has the record of the 32 electrods of the EEG over 25 seconds at 128Hz (3200 points)
 
 # In[4]:
 
@@ -54,6 +66,14 @@ if verbose:
     print(labelList[y[0]])
 
 
+# ## Preprocessing
+# 
+# We don't want to feed the raw inputs to our model, we will extract features from it.
+# 
+# The approach used was to use a time-frequency spectrogram with the alpha, beta, gamma, delta and theta bands (those are intervals in the frequency domain).
+# 
+# After the preprocessing step we have a 32 channels 5x101 image for each sample. 5 corresponds to the 5 frequency intervals and 101 are the time intervals.
+
 # In[5]:
 
 
@@ -62,13 +82,13 @@ hyperparams ={"bands_param": "five"} # hop time in seconds
 # Applies preprocessing
 print("Preprocessing input data")
 X = checkpoint(lambda : preprocess_dataset(X_raw, hyperparams["bands_param"], verbose=True), "preprocessed")
-print(f"Input dataset shape: {X.shape}")
+print(f"Preprocessed inpu dataset shape: {X.shape}")
 
 # Stores in a TensorDataset
-dataset = DataModule(X, y, val_part=0.2, test_part=0)
+dataset = DataModule(X, y, val_part=0.15, test_part=0.15)
 
-# Uncomment to try overfitting
-#dataset = dataset.get_part(0.25)
+# Uncomment to reduce the size of the dataset
+# dataset = dataset.get_part(0.1)
 
 
 # In[6]:
@@ -84,7 +104,66 @@ if verbose:
     plt.show()
 
 
-# In[9]:
+# ## The model
+# 
+# Here are the layers of the model: 
+# - BatchNorm2d
+# 
+# - Conv2d          
+# 32 to 128 channels, kernel_size of 5, stride 1, padding 2
+# 
+# - Dropout2d       
+# 0.3 probability of channel dropout
+# 
+# - BatchNorm2d
+# 
+# - ReLU
+# 
+# - Conv2d          
+# 128 to 64 channels, kernel_size of 5, stride 1, padding 2
+# 
+# - Dropout2d       
+# 0.2 probability of channel dropout
+# 
+# - BatchNorm2d
+# 
+# - ReLU
+# 
+# - Conv2d          
+# 64 to 32 channels, kernel_size of 5, stride 1, padding 2
+# 
+# - Dropout2d       
+# 0.2 probability of channel dropout
+# 
+# - BatchNorm2d
+# 
+# - ReLU
+# 
+# - Flatten
+# 
+# - Fully-Connected 
+# 32*101*5 to 128 layers
+# 
+# - Dropout         
+# 0.5 probability of neuron dropout
+# 
+# - BatchNorm
+# 
+# - ReLU
+# 
+# - Fully-Connected 
+# 128 to 4 layers
+# 
+# - SoftMax loss
+# 
+# 
+# ## The training
+# 
+# - Adam optimizer was used
+# - L2 regularization added to the loss
+# - Every epoch, the learning rate is reduced by 1%
+
+# In[7]:
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -102,22 +181,27 @@ classification_model = GoodClassificationModel(model, loss_fn, hyperparams, devi
 trainer = GoodTrainer()
 
 def babysitter(goodModel):
-    if (goodModel.epoch %  10 == 0):
-        goodModel.hyperparameters['lr'] = 0.99 * goodModel.hyperparameters['lr']
+    goodModel.hyperparameters['lr'] = 0.99 * goodModel.hyperparameters['lr']
 
 trainer.add_babysitter(babysitter)
-trainer.add_logger(lambda res: print_stats(res, print_every=10))
-trainer.add_logger(WandBReporter(hyperparams, labelList, model))
+trainer.add_logger(lambda res: print_stats(res, print_every=100))
+trainer.add_logger(WandBLogger(hyperparams, labelList, model))
 
 
-# In[ ]:
+# In[8]:
 
 
-trainer.train(classification_model, dataset, 1500)
+trainer.train(classification_model, dataset, 10)
 
 
-# In[ ]:
+# # Results
+
+# In[9]:
 
 
-
+res = (getTestResults(dataset, classification_model))
+print(f" Test accuracy: {res['test_acc']}")
+test_preds, test_labels = res["test_confusion"]
+plot_confusion_matrix(test_preds, test_labels, labelList)
+plt.plot()
 

@@ -8,7 +8,7 @@ load_dotenv()
 with open("config.json") as f:
     cfg = json.load(f)
 
-class WandBReporter():
+class WandBLogger():
     def __init__(self, hyperparameters, labelList, model):
         self.labelList = labelList
         wandb.login(key=os.environ.get("WANDB_API_KEY"))
@@ -20,18 +20,19 @@ class WandBReporter():
 
 
     def __call__(self, res):
-        val_preds, val_labels = res["val_confusion"]
-        val_preds = val_preds.cpu().numpy().tolist()
-        val_labels = val_labels.cpu().numpy().tolist()
-        self.run.log({
-            "train/loss": res["train_loss"],
-            "val/loss": res["val_loss"],
-            "train/acc": res["train_acc"],
-            "val/acc" : res["val_acc"]
-        })
-        # self.run.log(
-        #     "val/conf_mat": wandb.plot.confusion_matrix(preds=val_preds, y_true=val_labels, class_names=self.labelList)
-        # )
+        for part in ["train", "val"]:
+            for metric in ["loss", "acc"]:
+                if (f"{part}_{metric}" in res):
+                    self.run.log({
+                        f"{part}/{metric}": res[f"{part}_{metric}"]
+                    })
+            if f"{part}_confusion" in res and part=="val":
+                preds, labels = res["val_confusion"]
+                preds = preds.cpu().numpy().tolist()
+                labels = labels.cpu().numpy().tolist()
+                self.run.log({
+                    f"{part}/confusion": wandb.plot.confusion_matrix(preds=preds, y_true=labels, class_names=self.labelList)
+                })
 
 def print_stats(res, print_every=1):
     if (res['epoch'] % print_every == 0):

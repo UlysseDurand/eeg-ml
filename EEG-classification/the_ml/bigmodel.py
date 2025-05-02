@@ -8,12 +8,12 @@ def model(x_example, hyperparameters):
 
     return nn.Sequential(
         nn.BatchNorm2d(num_channels),
-        ConvLayer(num_channels, num_channels*4, 0.3, 5), # (B, num_channels, h, w) -> (B, num_channels, h-2, w-2)
-        ConvLayer(num_channels*4, num_channels*2, 0.2, 5), # (B, num_channels, h-2, w-2) -> (B, num_channels, h-4, w-4)
-        ConvLayer(num_channels*2, num_channels, 0.2, 5), # (B, num_channels, h-4, w-4) -> (B, num_channels, h-6, w-6)
+        ConvLayer(num_channels, num_channels*4, 0.3, 5),
+        ConvLayer(num_channels*4, num_channels*2, 0.2, 5),
+        ConvLayer(num_channels*2, num_channels, 0.2, 5),
         nn.Flatten(),
         LinearLayer(num_channels*h*w, 128, 0.5),
-        LinearLayer(128, 4, 0.6)
+        nn.Linear(128, 4)
     )
 
 def ConvLayer(inputChannels, outputChannels, dropout, ks):

@@ -36,3 +36,6 @@ clean_checkpoint:
 
 clean:
 	git clean -fdX
+
+main.pdf: main.py
+	. venv/bin/activate && jupyter nbconvert --to pdf --execute main.ipynb --log-level=INFO
