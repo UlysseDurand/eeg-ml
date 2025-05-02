@@ -57,7 +57,7 @@ if verbose:
 # In[5]:
 
 
-hyperparams = {"bands_param": 1} # hop time in seconds
+hyperparams ={"bands_param": "five"} # hop time in seconds
 
 # Applies preprocessing
 print("Preprocessing input data")
@@ -84,16 +84,16 @@ if verbose:
     plt.show()
 
 
-# In[7]:
+# In[9]:
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("GPU" if torch.cuda.is_available() else "CPU")
 
 hyperparams |= {
-    'lr': 2e-4,
+    'lr': 1e-4,
     'weight_decay': 2e-4,
-    'batch_size': 16
+    'batch_size': 512
 }
 model = bigmodel.model(X[0], hyperparams)
 loss_fn = nn.CrossEntropyLoss()
@@ -103,15 +103,21 @@ trainer = GoodTrainer()
 
 def babysitter(goodModel):
     if (goodModel.epoch %  10 == 0):
-        goodModel.hyperparameters['lr'] = 0.9 * goodModel.hyperparameters['lr']
+        goodModel.hyperparameters['lr'] = 0.99 * goodModel.hyperparameters['lr']
 
-trainer.add_babysitter(babysitter)
-trainer.add_logger(print_stats)
+# trainer.add_babysitter(babysitter)
+trainer.add_logger(lambda res: print_stats(res, print_every=10))
 trainer.add_logger(WandBReporter(hyperparams, labelList, model))
 
 
 # In[ ]:
 
 
-trainer.train(classification_model, dataset, 1000)
+trainer.train(classification_model, dataset, 30000)
+
+
+# In[ ]:
+
+
+
 
