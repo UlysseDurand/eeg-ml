@@ -203,5 +203,4 @@ res = (getTestResults(dataset, classification_model))
 print(f" Test accuracy: {res['test_acc']}")
 test_preds, test_labels = res["test_confusion"]
 plot_confusion_matrix(test_preds, test_labels, labelList)
-plt.plot()
 
