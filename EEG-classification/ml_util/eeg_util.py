@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 
-def plotEEG(eeg, channels = range(32), totalTime = 25, title=""):
+def plotEEG(eeg, channels = range(32), totalTime = 25, title="", fileName=None):
+    plt.figure()
     # First dimension for the number of electrodes
     # Second dimension for the data
     assert len(eeg.shape) == 2
@@ -12,19 +13,8 @@ def plotEEG(eeg, channels = range(32), totalTime = 25, title=""):
         plt.axhline(offset, color='gray', linestyle='--', linewidth=0.5)
         plt.text(-2, offset, f'Ch {i+1}', va='center', ha='right', fontsize=8)
     plt.xlabel('Time (s)')
-    plt.title('EEG of '+title)
+    plt.title(title)
     plt.gca().set_yticks([])
     plt.gca().set_yticklabels([])
-    plt.show()
-
-def plotTimeFreqEEG(sample):
-    fig, axes = plt.subplots(8, 4)
-    axes = axes.flatten()
-    
-    for i, ax in enumerate(axes):
-        ax.imshow(sample[i], cmap='plasma')
-        ax.axis('off')  # Hide axes
-        
-    # plt.tight_layout()
-    fig.subplots_adjust(top=0.9)
-    return fig, axes
+    if (fileName):
+        plt.savefig(fileName, dpi=300, bbox_inches='tight')

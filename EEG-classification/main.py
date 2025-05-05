@@ -1,21 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
-# Define the verbose variable
-verbose = False
-
-# Check if we're running in a Jupyter Notebook (not compiled script)
-try:
-    __IPYTHON__
-    verbose = True  # Set verbose to True if running in a Jupyter Notebook
-except NameError:
-    pass  # Do nothing if we're not in a notebook
-
-
-# In[2]:
+# In[ ]:
 
 
 # All the imports
@@ -24,6 +10,7 @@ import torch
 from torch.utils.data import TensorDataset
 from torch import nn
 import matplotlib.pyplot as plt
+import argparse
 
 from the_ml.load_dataset import labelList, get_data
 from the_ml.preprocess import preprocess_dataset
@@ -39,6 +26,29 @@ from ml_util.plot import plot_confusion_matrix
 
 # To make it reproducible
 torch.manual_seed(42)
+
+
+# In[ ]:
+
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument('--bands', default="five", help='number of bands for time-frequency spectrogram ("five") for usual bands')
+parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
+parser.add_argument('--weight_decay', type=float, default=0.0001, help='Weight decay (L2 regularization)')
+parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
+parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
+parser.add_argument('--verbose', type=bool, default=True, help='Make figures')
+
+args = parser.parse_args()
+hyperparams = {}
+
+print("Arguments: ")
+verbose = parser.verbose
+
+for attr, value in vars(args).items():
+    print(f'{attr}: {value}')
+    hyperparams[attr] = value
 
 
 # In[3]:
@@ -58,12 +68,13 @@ print(f"Raw input dataset size: {X_raw.shape}")
 # We extract the dataset to obtain 480 samples (120 for each task among Stroop, Relax, Mirror_Image, and Arithmetic).
 # Each sample has the record of the 32 electrods of the EEG over 25 seconds at 128Hz (3200 points)
 
-# In[4]:
+# In[ ]:
 
 
 if verbose:
     plotEEG(X_raw[0], title="index 0")
     print(labelList[y[0]])
+    plt.savefig(f"fig/EEG_sample_example.png", dpi=300, bbox_inches='tight')
 
 
 # ## Preprocessing
@@ -91,7 +102,7 @@ dataset = DataModule(X, y, val_part=0.15, test_part=0.15)
 # dataset = dataset.get_part(0.1)
 
 
-# In[6]:
+# In[ ]:
 
 
 if verbose:
@@ -99,8 +110,8 @@ if verbose:
         sampleId = torch.where(y==label)[0][0]
         plt.figure()
         fig, axes = plotTimeFreqEEG(X[sampleId])
-        #plt.imshow(X[sampleId][0])
         fig.suptitle(f"Sample {sampleId}, with label {labelList[y[sampleId]]}")
+        plt.savefig(f"fig/{labelList[y[sampleId]]}_timefreq.png", dpi=300, bbox_inches='tight')
     plt.show()
 
 
@@ -163,17 +174,12 @@ if verbose:
 # - L2 regularization added to the loss
 # - Every epoch, the learning rate is reduced by 1%
 
-# In[7]:
+# In[ ]:
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("GPU" if torch.cuda.is_available() else "CPU")
 
-hyperparams |= {
-    'lr': 1e-4,
-    'weight_decay': 2e-2,
-    'batch_size': 512
-}
 model = bigmodel.model(X[0], hyperparams)
 loss_fn = nn.CrossEntropyLoss()
 
@@ -188,19 +194,21 @@ trainer.add_logger(lambda res: print_stats(res, print_every=100))
 trainer.add_logger(WandBLogger(hyperparams, labelList, model))
 
 
-# In[8]:
+# In[ ]:
 
 
-trainer.train(classification_model, dataset, 10)
+trainer.train(classification_model, dataset, hyperparams['epochs'])
 
 
 # # Results
 
-# In[9]:
+# In[ ]:
 
 
 res = (getTestResults(dataset, classification_model))
 print(f" Test accuracy: {res['test_acc']}")
 test_preds, test_labels = res["test_confusion"]
-plot_confusion_matrix(test_preds, test_labels, labelList)
+if verbose:
+    plot_confusion_matrix(test_preds, test_labels, labelList)
+    plt.savefig("fig/test_confusion_matrix.png", dpi=300, bbox_inches='tight')
 
