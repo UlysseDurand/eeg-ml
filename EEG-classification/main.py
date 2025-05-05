@@ -37,9 +37,9 @@ verbose = True
 hyperparams = {
     "bands": "five",
     "lr": 1e-3,
-    "weight_decay": 1e-4,
+    "weight_decay": 7e-2,
     "batch_size": 128,
-    "epochs": 300
+    "epochs": 500
 }
 
 
@@ -81,7 +81,7 @@ if verbose:
 # Applies preprocessing
 print("Preprocessing input data")
 X = checkpoint(lambda : preprocess_dataset(X_raw, hyperparams["bands"], verbose=True), "preprocessed")
-print(f"Preprocessed inpu dataset shape: {X.shape}")
+print(f"Preprocessed input dataset shape: {X.shape}")
 
 # Stores in a TensorDataset
 dataset = DataModule(X, y, val_part=0.15, test_part=0.15)
