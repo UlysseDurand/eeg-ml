@@ -22,7 +22,7 @@ from ml_util.data_module import DataModule
 from ml_util.trainer import GoodClassificationModel, GoodTrainer
 from ml_util.logger import WandBLogger, print_stats, HistoryLogger
 from ml_util.reporter import getTestResults
-from ml_util.plot import plot_loss_acc, plot_confusion_matrix, plot3D
+from ml_util.plot import plot_loss_acc, plot_confusion_matrix, plot3D, write_test_acc
 
 # To make it reproducible
 torch.manual_seed(42)
@@ -203,4 +203,5 @@ if verbose:
     plot_loss_acc(historyLogger.history, fileNameBase="fig/history")
     test_preds, test_labels = res["test_confusion"]
     plot_confusion_matrix(test_preds, test_labels, labelList, title="Test Confusion Matrix", fileName="fig/test_confusion_matrix.png")
+    write_test_acc(res['test_acc'], "fig/test_acc.txt")
 

@@ -68,7 +68,7 @@ def plot_loss_acc(history, title="", fileNameBase=None):
     if fileNameBase:
         plt.savefig(fileNameBase+"_acc", dpi=300, bbox_inches='tight')
 
-def plot_confusion_matrix(y_pred, y_true, labels, title="",fileName=None):
+def plot_confusion_matrix(y_pred, y_true, labels, title="",fileName=None, accFileName=None):
     plt.figure()
     y_pred = y_pred.cpu().numpy()
     y_true = y_true.cpu().numpy()
@@ -84,3 +84,7 @@ def plot_confusion_matrix(y_pred, y_true, labels, title="",fileName=None):
     plt.title(title)
     if fileName:
         plt.savefig(fileName, dpi=300, bbox_inches='tight')
+
+def write_test_acc(test_acc, filename):
+    with open(filename, 'w') as f:
+        f.write(f"{test_acc}")
