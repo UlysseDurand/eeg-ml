@@ -38,7 +38,7 @@ Here are the layers of the model:
 32 to 128 channels, kernel_size of 5, stride 1, padding 2
 
 - Dropout2d       
-0.3 probability of channel dropout
+0.5 probability of channel dropout
 
 - BatchNorm2d
 
@@ -48,7 +48,7 @@ Here are the layers of the model:
 128 to 64 channels, kernel_size of 5, stride 1, padding 2
 
 - Dropout2d       
-0.2 probability of channel dropout
+0.5 probability of channel dropout
 
 - BatchNorm2d
 
@@ -58,7 +58,7 @@ Here are the layers of the model:
 64 to 32 channels, kernel_size of 5, stride 1, padding 2
 
 - Dropout2d       
-0.2 probability of channel dropout
+0.5 probability of channel dropout
 
 - BatchNorm2d
 
@@ -67,10 +67,10 @@ Here are the layers of the model:
 - Flatten
 
 - Fully-Connected 
-32*101*5 to 128 layers
+$32 \times 101 \times 5$ to 128 layers
 
 - Dropout         
-0.5 probability of neuron dropout
+0.75 probability of neuron dropout
 
 - BatchNorm
 
