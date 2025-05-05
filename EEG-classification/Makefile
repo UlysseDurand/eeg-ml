@@ -7,7 +7,7 @@ run: main.py dataset/filtered_data
 
 dataset/Data.rar:
 	@echo "Downloading dataset..."
-	@cd dataset && python dl_dataset_1.py
+	@cd dataset && python dl_dataset.py
 	@echo "Now please extract filtered_data from dataset/Data.rar to dataset/filtered_data"
 
 main.py: main.ipynb
