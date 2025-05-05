@@ -43,9 +43,9 @@ class WandBLogger():
                 preds, labels = res["val_confusion"]
                 preds = preds.cpu().numpy().tolist()
                 labels = labels.cpu().numpy().tolist()
-                self.run.log({
-                    f"{part}/confusion": wandb.plot.confusion_matrix(preds=preds, y_true=labels, class_names=self.labelList)
-                })
+#                 self.run.log({
+#                     f"{part}/confusion": wandb.plot.confusion_matrix(preds=preds, y_true=labels, class_names=self.labelList)
+#                 })
 
 def print_stats(res, print_every=1):
     if (res['epoch'] % print_every == 0):

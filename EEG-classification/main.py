@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 # All the imports
@@ -16,39 +16,31 @@ from the_ml.load_dataset import labelList, get_data
 from the_ml.preprocess import preprocess_dataset
 from the_ml import bigmodel
 
-from ml_util.eeg_util import plotEEG, plotTimeFreqEEG
+from ml_util.eeg_util import plotEEG
 from ml_util.checkpoint import checkpoint
 from ml_util.data_module import DataModule
 from ml_util.trainer import GoodClassificationModel, GoodTrainer
-from ml_util.logger import WandBLogger, print_stats
+from ml_util.logger import WandBLogger, print_stats, HistoryLogger
 from ml_util.reporter import getTestResults
-from ml_util.plot import plot_confusion_matrix
+from ml_util.plot import plot_loss_acc, plot_confusion_matrix, plot3D
 
 # To make it reproducible
 torch.manual_seed(42)
 
 
-# In[ ]:
+# In[2]:
 
 
-parser = argparse.ArgumentParser()
+# Arguments
 
-parser.add_argument('--bands', default="five", help='number of bands for time-frequency spectrogram ("five") for usual bands')
-parser.add_argument('--lr', type=float, default=0.001, help='Learning rate')
-parser.add_argument('--weight_decay', type=float, default=0.0001, help='Weight decay (L2 regularization)')
-parser.add_argument('--batch_size', type=int, default=32, help='Batch size')
-parser.add_argument('--epochs', type=int, default=10, help='Number of epochs')
-parser.add_argument('--verbose', type=bool, default=True, help='Make figures')
-
-args = parser.parse_args()
-hyperparams = {}
-
-print("Arguments: ")
-verbose = parser.verbose
-
-for attr, value in vars(args).items():
-    print(f'{attr}: {value}')
-    hyperparams[attr] = value
+verbose = True
+hyperparams = {
+    "bands": "five",
+    "lr": 1e-3,
+    "weight_decay": 1e-4,
+    "batch_size": 128,
+    "epochs": 300
+}
 
 
 # In[3]:
@@ -68,13 +60,11 @@ print(f"Raw input dataset size: {X_raw.shape}")
 # We extract the dataset to obtain 480 samples (120 for each task among Stroop, Relax, Mirror_Image, and Arithmetic).
 # Each sample has the record of the 32 electrods of the EEG over 25 seconds at 128Hz (3200 points)
 
-# In[ ]:
+# In[4]:
 
 
 if verbose:
-    plotEEG(X_raw[0], title="index 0")
-    print(labelList[y[0]])
-    plt.savefig(f"fig/EEG_sample_example.png", dpi=300, bbox_inches='tight')
+    plotEEG(X_raw[0], title=f"EEG, index 0, task {labelList[y[0]]}", fileName=f"fig/EEG_sample_example.png")
 
 
 # ## Preprocessing
@@ -88,11 +78,9 @@ if verbose:
 # In[5]:
 
 
-hyperparams ={"bands_param": "five"} # hop time in seconds
-
 # Applies preprocessing
 print("Preprocessing input data")
-X = checkpoint(lambda : preprocess_dataset(X_raw, hyperparams["bands_param"], verbose=True), "preprocessed")
+X = checkpoint(lambda : preprocess_dataset(X_raw, hyperparams["bands"], verbose=True), "preprocessed")
 print(f"Preprocessed inpu dataset shape: {X.shape}")
 
 # Stores in a TensorDataset
@@ -102,17 +90,17 @@ dataset = DataModule(X, y, val_part=0.15, test_part=0.15)
 # dataset = dataset.get_part(0.1)
 
 
-# In[ ]:
+# In[6]:
 
 
 if verbose:
     for label in range(4):
         sampleId = torch.where(y==label)[0][0]
-        plt.figure()
-        fig, axes = plotTimeFreqEEG(X[sampleId])
-        fig.suptitle(f"Sample {sampleId}, with label {labelList[y[sampleId]]}")
-        plt.savefig(f"fig/{labelList[y[sampleId]]}_timefreq.png", dpi=300, bbox_inches='tight')
-    plt.show()
+        plot3D(X[sampleId], 
+               title=f"Sample {sampleId}, Task: {labelList[y[sampleId]]}",
+               titles=lambda i: f"Channel {i+1}",
+               size_factor_x=2.0, size_factor_y=1.0,
+               fileName=f"fig/sample_{labelList[y[sampleId]]}.png")
 
 
 # ## The model
@@ -174,7 +162,7 @@ if verbose:
 # - L2 regularization added to the loss
 # - Every epoch, the learning rate is reduced by 1%
 
-# In[ ]:
+# In[7]:
 
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -189,8 +177,11 @@ trainer = GoodTrainer()
 def babysitter(goodModel):
     goodModel.hyperparameters['lr'] = 0.99 * goodModel.hyperparameters['lr']
 
+historyLogger = HistoryLogger()
+
 trainer.add_babysitter(babysitter)
-trainer.add_logger(lambda res: print_stats(res, print_every=100))
+trainer.add_logger(lambda res: print_stats(res, print_every=10))
+trainer.add_logger(historyLogger)
 trainer.add_logger(WandBLogger(hyperparams, labelList, model))
 
 
@@ -205,10 +196,11 @@ trainer.train(classification_model, dataset, hyperparams['epochs'])
 # In[ ]:
 
 
-res = (getTestResults(dataset, classification_model))
+res = getTestResults(dataset, classification_model)
 print(f" Test accuracy: {res['test_acc']}")
-test_preds, test_labels = res["test_confusion"]
+
 if verbose:
-    plot_confusion_matrix(test_preds, test_labels, labelList)
-    plt.savefig("fig/test_confusion_matrix.png", dpi=300, bbox_inches='tight')
+    plot_loss_acc(historyLogger.history, fileNameBase="fig/history")
+    test_preds, test_labels = res["test_confusion"]
+    plot_confusion_matrix(test_preds, test_labels, labelList, title="Test Confusion Matrix", fileName="fig/test_confusion_matrix.png")
 
