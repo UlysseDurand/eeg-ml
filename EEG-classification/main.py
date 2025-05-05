@@ -39,7 +39,7 @@ hyperparams = {
     "lr": 1e-3,
     "weight_decay": 7e-2,
     "batch_size": 128,
-    "epochs": 500
+    "epochs": 1000
 }
 
 
