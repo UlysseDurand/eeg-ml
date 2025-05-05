@@ -8,6 +8,19 @@ load_dotenv()
 with open("config.json") as f:
     cfg = json.load(f)
 
+class HistoryLogger():
+    def __init__(self):
+        self.history = {
+        }
+
+    def __call__(self, res):
+        for key, value in res.items():
+            if key in self.history:
+                self.history[key].append(value)
+            else:
+                self.history[key] = [value]
+
+
 class WandBLogger():
     def __init__(self, hyperparameters, labelList, model):
         self.labelList = labelList

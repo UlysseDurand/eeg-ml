@@ -3,7 +3,7 @@
 NVIDIA_GPU_CHECK := $(shell nvidia-smi > /dev/null 2>&1 && echo 1 || echo 0)
 
 run: main.py dataset/filtered_data
-	. venv/bin/activate && python main.py
+	. venv/bin/activate && python main.py --lr=1e-3 --weight_decay=1e-4 --epochs=10
 
 dataset/Data.rar:
 	@echo "Downloading dataset..."

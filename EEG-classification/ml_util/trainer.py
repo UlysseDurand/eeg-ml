@@ -96,7 +96,7 @@ class GoodClassificationModel():
             for a, b in self.epoch_log[key]:
                 res += a * b
                 total += b
-            return res / total
+            return (res / total).detach().cpu().item()
         else:
             raise RuntimeError(f"{key} not logged during epoch calculation")
     
