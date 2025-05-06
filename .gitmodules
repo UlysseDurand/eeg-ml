@@ -1,0 +1,3 @@
+[submodule "DreamDiffusion"]
+	path = DreamDiffusion
+	url = https://github.com/UlysseDurand/DreamDiffusion
