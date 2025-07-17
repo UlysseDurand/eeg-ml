@@ -1,0 +1,81 @@
+\tikzset{
+  >=Stealth,
+  block/.style      = {draw, thick, shape=rectangle, minimum width=3.2cm,
+                       minimum height=1.1cm, align=center, font=\footnotesize},
+  group/.style      = {draw, dashed, rounded corners, inner sep=4pt},
+  latent/.style     = {block, fill=gray!15},
+  data/.style       = {block, fill=blue!10},
+  model/.style      = {block, fill=green!10},
+  loss/.style       = {block, fill=red!10},
+  train/.style = {very thick},
+}
+
+\begin{tikzpicture}[node distance=1.6cm and 0.6cm]
+
+% INPUT & PRE-PROC
+\node[data] (sample) {EEG sample};
+\draw ($(sample) + (-2.5, 0)$) edge[->, train] (sample);
+
+% ENCODER
+\node[model, below=of sample] (tokenize) {Tokenize};
+\draw (sample) edge[->, train] node[midway, left] {$(C, T)$} (tokenize);
+\node[model, below=of tokenize] (plus) {+};
+\draw (tokenize) edge[->, train] node[midway, left] {$(d_e, \frac{T}{p})$} (plus);
+\node[rotate=90, align=center, left=of tokenize] (pos_embed) {position\\embedding};
+\path coordinate (midpoint0) at ($(pos_embed |- plus)$);
+\draw (pos_embed) edge[train] (midpoint0)
+      (midpoint0) edge[->, train] (plus);
+\node[model, below= of plus] (masking) {Masking $(r)$};
+\draw (plus) edge[->, train] node[midway, left] {$(d_e, \frac{T}{p})$} (masking);
+\node[model, below= of masking] (vision) {Vision Transformer};
+\draw (masking) edge[->, train] node[midway, left] {$(d_e, \frac{T\times r}{p})$} (vision);
+
+% DECODER
+\node[model, right=of vision] (fcdec) {FC};
+\node[model, above=of fcdec] (unmasking) {Unmasking};
+\draw (fcdec) edge[->, train] node[midway, right] {$(d_e', \frac{T\times r}{p})$} (unmasking);
+\node[model, above= of unmasking] (visiondec) {Vision Transformer};
+\draw (unmasking) edge[->, train] node[midway, right] {$(d_e', \frac{T}{p})$} (visiondec);
+\node[model, above=of visiondec] (untokenize) {Untokenize};
+\draw (visiondec) edge[->, train] node[midway, right] {$(d_e', \frac{T}{p})$} (untokenize);
+
+% LATENT
+\node[latent, below=of $(vision)!0.5!(fcdec)$] (latent) {latent};
+\path coordinate (midpoint1) at ($(vision |- latent)$);
+\draw (vision) edge[train] (midpoint1)
+      (midpoint1) edge[->, train] (latent);
+\path coordinate (midpoint2) at ($(fcdec |- latent)$);
+\draw (latent) edge[train] (midpoint2)
+      (midpoint2) edge[->, train] (fcdec);
+
+\node[below= 0.5cm of latent] (mask) {mask};
+\path coordinate (midpoint3) at ($(masking)+(-2,0)$);
+\path coordinate (midpoint4) at ($(midpoint3 |- mask)$);
+\draw (masking) edge[train] (midpoint3)
+      (midpoint3) edge[train] (midpoint4)
+      (midpoint4) edge[->, train] (mask);
+\path coordinate (midpoint6) at ($(unmasking)+(2,0)$);
+\path coordinate (midpoint5) at ($(midpoint6 |- mask)$);
+\draw (mask) edge[train] (midpoint5)
+      (midpoint5) edge[train] (midpoint6)
+      (midpoint6) edge[->, train] (unmasking);
+
+% OUTPUT
+\node[data, above=of untokenize] (reconst) {Reconstructed};
+\draw(untokenize) edge[->, train] node[midway, right] {$(C, T)$} (reconst);
+
+% LOSS
+\node[model, above=of sample] (mse) {Mean Square Error};
+\draw (sample) edge[->, train] (mse)
+      (reconst) edge[->, train] (mse);
+\node[loss, right=of mse] (loss) {EEG Autoencoder loss};
+\draw (mse) edge[->, train] (loss);
+
+
+% GROUP BOXES (dashed) ---------------------------------------------------------
+\node[group,fit=(tokenize)(plus)(masking)(vision)] (encgroup) {};
+\node[rotate=90] at ($(encgroup.west) + (-0.8,0)$) {\small \textbf{EEG ENCODER}};
+\node[group,fit=(fcdec)(unmasking)(visiondec)(untokenize)] (decgroup) {};
+\node[rotate=-90] at ($(decgroup.east) + (0.8,0)$) {\small \textbf{EEG DECODER}};
+
+\end{tikzpicture}

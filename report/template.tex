@@ -1,0 +1,21 @@
+\documentclass[]{rapportECLMU}
+
+\ttitle{ {{title}} }
+\UE{ {{UE}} }
+\subject{ {{subject}} }
+\tutor{ {{tutor}} }
+\student { {{student}} }
+
+\bibliography{references}
+
+\begin{document}
+
+\makemargins
+\makefirstpage
+
+\newcommand{\myinput}[1]{\input{ {{srcfolder}}/#1 }}
+\myinput{ {{bodytex}} }
+
+\printbibliography
+
+\end{document}

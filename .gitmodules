@@ -1,3 +1,6 @@
 [submodule "DreamDiffusion"]
 	path = DreamDiffusion
 	url = https://github.com/UlysseDurand/DreamDiffusion
+[submodule "BrainVis"]
+	path = BrainVis
+	url = https://github.com/UlysseDurand/BrainVis
