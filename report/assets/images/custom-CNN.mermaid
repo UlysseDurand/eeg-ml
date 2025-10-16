@@ -1,0 +1,13 @@
+graph TD
+    A[BatchNorm2d] --> B[Conv2d<br>32→128, k=5, s=1, p=2]
+    B --> C[Dropout2d<br>p=0.3]
+    C --> D[BatchNorm2d + ReLU]
+    D --> E[Conv2d<br>128→64, k=5, s=1, p=2]
+    E --> F[Dropout2d<br>p=0.2]
+    F --> G[BatchNorm2d + ReLU]
+    G --> H[Flatten]
+    H --> I[FC<br>32×101×5→128]
+    I --> J[Dropout<br>p=0.5]
+    J --> K[BatchNorm + ReLU]
+    K --> L[FC<br>128→4]
+    L --> M[Softmax]

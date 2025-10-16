@@ -55,7 +55,7 @@ print(f"Raw input dataset size: {X_raw.shape}")
 # 
 # It consists of electroencephalograms (EEG) of people while they perform tasks.
 # 
-# You can find the dataset [here](https://figshare.com/articles/dataset/SAM_40_Dataset_of_40_Subject_EEG_Recordings_to_Monitor_the_Induced-Stress_while_performing_Stroop_Color-Word_Test_Arithmetic_Task_and_Mirror_Image_Recognition_Task/14562090)
+# You can find the dataset [here](https://figshare.com/articles/dataset/SAM_40_Dataset_of_40_Subject_EEG_Recordings_to_Monitor_the_Induced-Stress_while_performing_Stroop_Color-Word_Test_oArithmetic_Task_and_Mirror_Image_Recognition_Task/14562090)
 # 
 # We extract the dataset to obtain 480 samples (120 for each task among Stroop, Relax, Mirror_Image, and Arithmetic).
 # Each sample has the record of the 32 electrods of the EEG over 25 seconds at 128Hz (3200 points)

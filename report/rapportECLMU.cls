@@ -1,6 +1,6 @@
 \LoadClass[a4paper,12pt]{article}
 
-\RequirePackage[french]{babel}
+\RequirePackage[english]{babel}
 \RequirePackage[utf8]{inputenc}
 \RequirePackage[section]{placeins}
 \RequirePackage[T1]{fontenc}
@@ -17,9 +17,22 @@
 \RequirePackage{fancyhdr}
 \RequirePackage{url}
 \RequirePackage[hidelinks]{hyperref}
-\RequirePackage[left=2.5cm,right=2.5cm,top=2cm,bottom=3.5cm]{geometry}
+\RequirePackage[includehead, left=2.5cm,right=3.5cm,top=2cm,bottom=3.5cm]{geometry}
 \RequirePackage{cleveref}
 \RequirePackage{tikz}
+\RequirePackage{listings}
+\RequirePackage{xcolor}
+
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  breaklines=true,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{teal},
+  showstringspaces=false
+}
 
 \usetikzlibrary{graphs, graphdrawing, positioning, arrows.meta, shapes.geometric, fit, calc}
 \usegdlibrary{force}
@@ -34,18 +47,23 @@
 \newcommand{\makemargins}{
   \makenomenclature
   \pagestyle{fancy}
-  \fancyheadoffset{1cm}
-  \setlength{\headheight}{2cm}
+  % \fancyheadoffset{1cm}
+  \setlength{\headheight}{1.5cm}
+  % \setlength{\headsep}{1.5cm}       % space between header and text
+  % \setlength{\footskip}{1.5cm}      % space between text and footer
+
   \lhead{
-    \includegraphics[height=0.05\textheight]{assets/logos/logoECL.png}
+    \raisebox{-0.5\height}{\includegraphics[height=0.05\textheight]{assets/logos/logoECL.png}}
     \hspace{1cm}
-    \includegraphics[height=0.05\textheight]{assets/logos/logoMU.pdf}
+    \raisebox{-0.5\height}{\includegraphics[height=0.035\textheight]{assets/logos/logoMU.pdf}}
+    \vspace{0.5cm}
   }
   \rhead{ \nouppercase{\leftmark} }
   \rfoot{\thepage}
   \cfoot{ }
   \lfoot{\ttitle}
 }
+\renewcommand{\footrulewidth}{0.4pt}
 
 \newcommand{\makefirstpage}{
   \begin{titlepage}
@@ -53,7 +71,7 @@
     \ThisLRCornerWallPaper{0.6}{assets/logos/SteinECL.jpg}
     \centering
     \includegraphics[height=0.1\textheight]{assets/logos/logoECL.png}\par\vspace{1cm}
-    \includegraphics[height=0.1\textheight]{assets/logos/logoMU.pdf}\par\vspace{1cm}
+    \includegraphics[height=0.07\textheight]{assets/logos/logoMU.pdf}\par\vspace{1cm}
 
     \vspace{1.5cm}
     {\scshape\Large \UE \\ \subject \par}

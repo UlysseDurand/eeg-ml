@@ -1,0 +1,199 @@
+The main objective of the internship was to work with
+DreamDiffusion\cite{dreamdiffusion}, an EEG to image generator. In this part of
+the internship it was asked to reproduce the DreamDiffusion results, and if
+possible, to improve them, this would make enough material to make a paper.
+However it showed many difficulties, the paper's results were very hard to
+reproduce as the code was working in a not specified environment. The README
+gave many steps in reproducing the paper but some were totally missing and the
+GitHub issues are full of users complaining about it.
+
+\subsubsection{The dataset}
+
+DreamDiffusion used the CVPR40 dataset
+\cite{CVPR40-1}\cite{CVPR40-2}\cite{CVPR40link}. \cref{fig:eeg-setup} (FROM
+\cite{CVPR40-2}) shows the setup for recording the dataset. One person looks at
+an image while its brain signals are being recorded. The cap used 128 electrodes
+and the images were shown for 10s with a black screen of 10s between two images.
+The images shown come from 40 of the classes of the ImageNet dataset.
+
+To work with the dataset we don't use the raw recorded EEG, we use the
+prefiltered EEGs with a bandpass from 9 to 95Hz.
+
+\insertfigure
+    {assets/images/cvpr40-eeg-setup}
+    {width=0.8\textwidth}
+    {Setup for CVPR40 dataset (IMAGE FROM \cite{CVPR40-2})}
+    {fig:eeg-setup}
+
+\subsubsection{The DreamDiffusion paper}
+
+DreamDiffusion aims to be able to see what people see only from their brain
+activity. This is still far from being a machine that can show what people can
+dream of because the results are not that promising. The paper doesn't show any
+metric, only examples of generated images and we discuss in the results section
+about how far from perfect the model is.
+
+The DreamDiffusion model is a built on top of pretrained Stable Diffusion
+v1.5\cite{stable-diffusion}, but using a latent from a custom EEG autoencoder as
+conditioning and adding a CLIP loss to align with. This EEG autoencoder is a
+Masked Autoencoder (MAE) and is pretrained in a separated first time.
+
+Ideas in this paper mostly come from the MinD-Vis \cite{mindvis} paper, tackling
+the same problem of image generation but with fMRI instead of EEG as input.
+DreamDiffusion took the code MinD-Vis code and changed it to take EEGs as input.
+However, when MinD-Vis calculated their Fréchet Inception Distance \cite{fid}
+(FID), a metric that assesses the image generation quality, DreamDiffusion
+didn't, but in the MinD-Vis paper they precise that this score has poor
+coherence in the context of a relatively small dataset, this is the case of
+DreamDiffusion.
+
+The metric DreamDiffusion used is the accuracy score of a pretrained ImageNet
+classifier, it gives what part of the generated images were well classified in
+the same class as the ground truth image really is. It gives a score of 45
+percent to DreamDiffusion.
+
+\cref{fig:dreamdiffusion-diagram} (FROM \cite{dreamdiffusion}) shows the whole
+pipeline that is explained in the following.
+
+\insertfigure
+    {assets/images/dreamdiffusion-diagram}
+    {width=\textwidth}
+    {DreamDiffusion pipeline (IMAGE FROM \cite{dreamdiffusion})}
+    {fig:dreamdiffusion-diagram}
+
+\subsubsection{Training the EEG MAE}
+
+A Masked Autoencoder is a model that was first used in \cite{mae}, the paper
+shows the usage of these autoencoders with images, hiding patches of the image
+during the training and teaching the model to reconstruct the base image. The
+same idea is used here to have  
+
+The MAE works as shown in \cref{fig:eeg-mae-diagram}. It is trained alone to
+minimize the difference between the EEG sample and the reconstructed one and the
+latent vector is supposed to carry all the information about the EEG sample but
+in a different format. In the diagram $C$ is the number of channels of the EEG,
+$T$ is the number of time steps in a sample, $d_e$ is the tokenizing output
+dimension, $p$ is the number of patches the tokenizer makes, $r$ is the masking
+ration ($0.5$ means that half the token will be removed), FC stands for fully
+connected layer.
+
+\begin{figure}[H]
+    \centering
+    \caption{EEG MAE diagram}
+    \input{src/work/dreamdiffusion.tikz}
+    \label{fig:eeg-mae-diagram}
+\end{figure}
+
+After a good amount of training with enough dropout we have a good EEG MAE, some
+signals, being masked and reconstructed again are shown together in
+\cref{fig:mae-reconstruct}. This is the reproduced result by Racim Menasria, an
+older intern who worked on the subject with the same team.
+
+\insertfigure
+    {assets/images/reconstructed-eeg}
+    {width=\textwidth}
+    {Trained MAE results}
+    {fig:mae-reconstruct}
+
+\subsubsection{Training the diffusion model}
+
+The second step was to train the stable diffusion model with this latent vector
+as conditioning. In parallel we add a CLIP \cite{clip} loss to align the VAE
+latent with the CLIP embeddings, that way, we can start from the pretrained
+stable diffusion model as the conditionning from the pretrained checkpoint is
+matching with CLIP embeddings.
+
+The diffusion model comes from \cite{stable-diffusion}. It is a Variational
+Autoencoder (VAE) followed by a diffuser, as shown in (FROM
+\cite{stable-diffusion}) \cref{fig:stablediffusion-pipeline}.
+
+\insertfigure
+    {assets/images/stable-diffusion-pipeline}
+    {width=\textwidth}
+    {Stable Diffusion model (IMAGE FROM \cite{stable-diffusion})}
+    {fig:stablediffusion-pipeline}
+
+Contrary to a basic diffusion model\cite{diffusion}, this one is conditioned,
+the attention layers in the U-NET take keys and values from the conditioning
+latent vector.  This diffusion process have a loss for each step of the
+diffusion, comparing the noised ground truth image with the denoised vector
+$z_T$, plus, a loss from the CLIP embedding of the ground truth image.
+
+To sum up, we can count three losses in this training that are combined
+
+\begin{itemize}
+    \item Diffusion loss: at each step of the diffusion, compare the denoised
+    vector with the noised one
+
+    \item VAE loss: compare $\mathcal{D}(\mathcal{E}(x))$ with $x$ for $x$ the
+    ground truth image.
+    
+    \item CLIP alignement loss: align the CLIP image embedding of the ground
+    truth image with the MAE latent vector. A projection layer transforms the
+    EEG embedding from the pretrained MAE to an embedding that matches CLIP
+    embedding of the ground truth image.
+\end{itemize}
+
+\subsubsection{The reproducibility}
+
+Reproducing DreamDiffusion was a long task, not only the training took around 12
+hours for the MAE but also around 20 hours for the diffusion model training, but
+the initial GitHub repository of DreamDiffusion gave no checkpoint for the MAE
+and no clear information on the training data for the MAE.
+
+To train the MAE all that is needed is a lot of EEG signals, but as few EEG
+datasets have 128 channels like the DreamDiffusion paper, data augmentation
+techniques were used in the code. Concerning the datasets all the authors of
+DreamDiffusion specified is that they took their data from the Mother of all BCI
+Benchmarks \cite{moabb} (MOABB) platform. A previous intern from 2024, Racim
+Menasria, had to reproduce DreamDiffusion. He choosed to use the
+GrosseWentrup2009 \cite{GrosseWentrup2009} and Schirrmeister2017
+\cite{Schirrmeister2017} datasets. In the process of reproducing what Racim did, I
+corrected an error in a dataset with a GitHub pull request
+\url{https://github.com/NeuroTechX/moabb/pull/781}. Not only the datasets used
+were hard to find but they were also very long to download as the server
+delivering them had internet limitations.
+
+Many little problems made the code work on the authors' machine but not on any
+other machine, those little issues were fixed and I proposed a pull request, but
+the authors did not answer
+\url{https://github.com/bbaaii/DreamDiffusion/pull/42}.
+
+At one time the goal was to try and improve DreamDiffusion with novels idea and
+I had to go through the whole code to begin with it. The code is taken from
+\cite{mindvis} so and the structure of the files and their roles was new to me
+so it also took a good amount of time to understand every bit.
+
+\subsubsection{Results}
+
+\insertfigure
+    {assets/images/dd-good}
+    {width=0.7\textwidth}
+    {Good result, ground truth on the left}
+    {fig:dd-good}
+
+It happens quite often that the generated image is of the good class (around 30
+percent of the time), but it fails to show good similarities, it feels like it's
+an EEG classifier and then an image generator from the guessed class. In
+\cref{fig:dd-good}, there is not many similarities apart from the fact that
+these are clownfish pictures, this is probably due to a not high enough
+coefficient to take into account the diffusion loss. This also explains why some
+images are incoherent.
+
+We can distinguish two common mistakes that happen in the 70 left percents. The
+first one is when the generated image is coherent and looks like a real image,
+but from another class \cref{fig:dd-coherent}. The other mistake is when the
+generated image is not coherent, it's hard to understand what is shown
+\cref{fig:dd-incoherent}.
+
+\insertfigure
+    {assets/images/dd-coherent}
+    {width=0.7\textwidth}
+    {Coherent generated image, bad class (ground truth on the left)}
+    {fig:dd-coherent}
+
+\insertfigure
+    {assets/images/dd-incoherent}
+    {width=0.7\textwidth}
+    {Incoherent generated image (ground truth on the left)}
+    {fig:dd-incoherent}

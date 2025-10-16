@@ -1,0 +1,165 @@
+In order to get used to the Machine Learning framework a first task was given to
+classify EEG signals of subjects executing different tasks. There are 4
+different tasks, Arithmetics, Mirror Images, Stroop, and Relax, and we expect
+the brain to have different behaviour during different tasks, so, to be able to
+classify the tasks from the EEG signals.
+
+\subsubsection{The dataset}
+
+The dataset SAM40\cite{Ghosh2022} includes brain records from 40 subjects
+performing different tasks. The EEG cap is a 32-channel Epoc Flex gel kit from
+the Emotiv company, which samples at 128 Hz.
+
+\cref{fig:example-input} shows an input example, and all the EEG input in this
+report will have be similar to this one (number of channels, sampling rate and
+total recording time can change).
+
+\insertfigure
+    {assets/images/classification-input-example}
+    {width=0.6\textwidth}
+    {Sample 0 (Arithmetic task)}
+    {fig:example-input}
+
+\subsubsection{EEG classification code structure}
+
+A big effort was made to have a clean, modular and reproducible code.  A
+significant amount of time was used to build my own python ml-util module that
+builds on top of PyTorch.
+
+The designed file structure is the following:
+\begin{verbatim}
+. README.md
+. Makefile
+- dataset           (Contains datasets)
+  + ...
+. main.ipynb        (Notebook used for demonstration)
++ the_ml            (python scripts for models, dataset 
+                     loading or preprocessing functions)
++ results           (To save results)
++ ml_util           (The custom python module)
++ checkpoints       (Stores checkpoints checkpoints)
++ config.json       (Basic hyperparameters or paths)
+\end{verbatim}
+
+The Makefile makes uses of the nbconverter command, it can generate a python
+script so the whole script can be run without jupyter notebook (This was needed
+because there was no port opening except the one for SSH on the supercomputer so
+it was impossible to access the jupyter notebook interface).  It can also run
+the notebook (without any GUI) and make a PDF out of it as a report.
+
+This makes the training of any machine learning model as simple as the following
+code.
+
+
+\lstinputlisting[language=Python, caption="Basic code example showing ml\_util capabilities"]{assets/images/module_train.py}
+
+
+The checkpoint function takes a callable function and a checkpoint name as
+argument, if the checkpoint name file exists in the checkpoints folder then the
+file is loaded and returned. Otherwise the callable function is computed and the
+checkpoint file is created.
+
+All of this clean code architecture was made to ensure reproducibility and
+readability. Extending the python module to more complex tasks than
+classification would require the researcher to make herited classes from the
+ml\_util classes, but they would prefer making unclear code instead to keep
+control of every optimization without thinking too much. This was kind of an
+attempt at copying the Pytorch Lightning module but it made a good training with
+PyTorch.
+
+This file structure is inspired from the Cookiecutter Data Science template
+\cite{ccds}. It serves to make the file structure common to many project so the
+code is easy to read and reproducible. This is a major concern as for many
+papers I had to reproduce in this internship it took a lot of time when it was
+possible. One other barrier to reproduce the papers was the datasets
+availability but this is for good reasons as there are privacy related reasons
+that they are not publicaly available and require to make an appliance.
+
+\subsubsection{Model for EEG classification}
+
+\insertfigure
+    {assets/images/general-classification-model}
+    {width=\textwidth}
+    {Overview of the classification model}
+    {fig:general-classification-model}
+
+First of all it is inconvenient to feed the raw inputs to our model, it's better
+to do feature extraction before.  We features we want to extract are the alpha,
+beta, gamma, delta, theta frequency bands that are very commonly used in
+neuroscience, thus, we preprocess the time-frequency 5-bands spectrogram to feed
+as a multi channel (one channel for each electrode) image. Indeed each sample
+gets converted to a 32 channels 5x101 image, 5 corresponds to the five frequency
+bands and 101 are the time intervals.
+
+In \cref{fig:sample0-preprocessd} we show such a preprocessd sample recorded
+during the arithmetic task.
+
+\insertfigure
+    {assets/images/eeg-classification-sample0-preprocessed}
+    {width=\textwidth}
+    {Preprocessed sample 0 (Arithmetic task)}
+    {fig:sample0-preprocessd}
+
+This multi-channels image is then fed into a custom Convolutional Neural Network
+(CNN) with the architecture shown in \cref{fig:customCNN}.
+
+This is a classical CNN architecture with a succession of 2d Convolution layers,
+and a 2 layers Multi-Layer Perceptron (MLP) before a Softmax loss.
+
+BatchNorm layers are used to improve the model learning stability and the
+droupout layers are used to prevent from overfitting which occured a lot in the
+experiments, over 90 percent training acccuracy was reached for 25 percent
+validation accuracy.
+
+\insertfigure
+    {assets/images/custom-CNN}
+    {height=0.5\textheight}
+    {Custom CNN for EEG classification}
+    {fig:customCNN}
+
+\subsubsection{Training the EEG classifier}
+
+The dataset was split, 70 percent was used for training, 15 percent for
+validation, and 15 percent for test.
+
+The validation is not trained on but serves as a test during training to tweak
+the hyperparameters to detect overfitting for example.
+
+The Adam optimizer was used, L2 regularization was added to the loss to prevent
+overfitting, and every epoch, the learning rate is reduced by 1 percent.
+
+We trained on 1000 epochs, it was enough to have a stable loss as shown in
+\cref{fig:classification-hist-loss}.
+
+\insertfigure
+    {assets/images/classification_history_loss}
+    {width=0.7\textwidth}
+    {History of loss over the epochs}
+    {fig:classification-hist-loss}
+
+We have profiles of accuracy where we can see no clear overfittng
+\cref{fig:classification-hist-acc}.
+
+\insertfigure
+    {assets/images/classification_history_acc}
+    {width=0.7\textwidth}
+    {History of accuracy over the epochs}
+    {fig:classification-hist-acc}
+
+\subsubsection{Results of the classifier}
+
+The evaluation of the model on the test split of the dataset gives a 56.94
+percent accuracy in the classification, the confusion matrix
+\cref{fig:confusion-matrix} shows that some tasks were easier to classify.
+
+\insertfigure
+    {assets/images/classification_confusion-matrix}
+    {width=0.6\textwidth}
+    {Confusion matrix of our classification model on the test split}
+    {fig:confusion-matrix}
+
+We can see that the model is very good (90 percent accuracy) at classifying the
+stroop effect but is pretty bad for the other tasks, especially the arithmetic
+task. This can either be due to the fact that the model is not good enough or
+that the EEG signals don't capture relevant enough information that can help
+classify the task.
