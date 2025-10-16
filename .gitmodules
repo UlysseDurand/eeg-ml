@@ -4,3 +4,6 @@
 [submodule "BrainVis"]
 	path = BrainVis
 	url = https://github.com/UlysseDurand/BrainVis
+[submodule "image-similarity-metrics"]
+	path = image-similarity-metrics
+	url = git@gitlab.com:ulysse_durand/image-similarity-metrics.git
