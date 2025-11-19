@@ -1,4 +1,4 @@
-\subsubsection{Mahindra University: history and fundings}
+\subsection{Mahindra University: history and fundings}
 
 Mahindra École Centrale College of Engineering was founded in 2014 in Hyderabad,
 Telangana, India, by the École Centrale group. It is sponsored by Mahindra
@@ -32,7 +32,7 @@ Hyderabad or IIIT Hyderabad, see \cref{fig:mu-map}.
     {MU on the map of Hyderabad (map from OpenStreetMap)}
     {fig:mu-map}
 
-\subsubsection{Research teams and projects}
+\subsection{Research teams and projects}
 
 During my internship I assisted Dr Nidhi Goyal, my supervisor, in many tasks. Dr
 Nidhi Goyal is Assistant Professor in the Computer Science and Engineering
@@ -44,19 +44,21 @@ Researcher), Gaspard Lefort (Intern), Shankar Sai Ankit Reddy (B.Tech Student)
 and me. It aimed to publish papers on generative AI and EEG, one paper on EEG to
 Image generative models (mine) and the other on EEG to Video generative models
 (Gaspard's). When Shankar Sai Amrit Patnaik was working from Delhi, the rest of
-us were in MU, but to keep contact with Amrit we made many videocalls. As Dr
-Nidhi Goyal is Assistant Professor, she is also a lecturer and couldn't be full
-time on the research project, she was also helping with clubs in the university.
+the team was in MU, so most of the meetings were from planned videocalls.  As Dr
+Nidhi Goyal is Assistant Professor, she couldn't be working full time on the
+research projects, she was also helping with clubs in the university, but when
+the summer vacations for students started, she could be working full time on
+research projects.
 
-Then, Gaspard and I helped to set up experiments about the attention of car
-drivers,  subjects drove on a driving simulator and were subject to disturbances
-(phone notification, dashboard warning light, storm), an eye tracker and a EEG
-headset monitored their reactions. The project was established through a
-collaboration between Mahindra University (MU) and the University of Hyderabad
-(UoH), the team was composed of Dr Sunder Bukya (MU), Dr Nidhi Goyal (MU), Dr
-Shiva Ram Reddy (UoH) and Srujan Kumar (B. Tech student from UoH).
+Then, Gaspard and I helped to set up experiments about attention of car drivers,
+subjects drove on a driving simulator and were subject to disturbances (phone
+notification, dashboard warning light, storm), an eye tracker and a EEG headset
+monitored their reactions. The project was established through a collaboration
+between Mahindra University (MU) and the University of Hyderabad (UoH), the team
+was composed of Dr Sunder Bukya (MU), Dr Nidhi Goyal (MU), Dr Shiva Ram Reddy
+(UoH) and Srujan Kumar (B. Tech student from UoH).
 
-\subsubsection{Differences with French universites}
+\subsection{Differences with French universites}
 
 In MU there were many differences with most universities in France, part of it
 is because India is culturally very different from France but also because
@@ -64,24 +66,22 @@ Mahindra University is a private school.
 
 Students in the University, but also PhDs and part of the researchers and
 teachers stay in the campus' hostel, bachelor and master students require
-permission to leave the campus. Construction workers, wardens, cleaning staff,
-canteen cooks were many and had a special uniform showing their role.
+permission to leave the campus. Students had many clubs in the university, and
+many of these clubs were study-related, students faced a high competition to be
+part of some clubs, they had to apply and go through an interview.
 
-Students had many clubs in the university, but those clubs quite often work
-related, like a programming club, crafting club, research club, etc... Students
-faced a high competition to be part of some clubs, they had to apply and go
-through an interview.
-
-There were also many cultural events, about litterature, spirituality or the
+There were also many cultural events about litterature, spirituality or the
 "francophony week", where they showed French movies or French food.  Bachelor
-students had a mantaory French language course. 
+students had a mantaory French language course as part of the Ecole Centrale
+group connection. 
 
-\subsubsection{Using a supercomputer (NVidia DGX-A100)}
+\subsection{Using a supercomputer (NVidia DGX-A100)}
 
-The NVidia DGX-A100 Cluster.
+MU has a NVidia DGX-A100 Cluster contains 8 DGX-A100 GPUs with 64 CPU cores. It
+is mainly used for machine learning tasks are they require a lot of parallel
+computational capabilities.
 
-A supercomputer had to be used to perform the experiments and it showed multiple
-difficulties
+Using this supercomputer showed many difficulties.
 \begin{itemize}
 \item The memory limit
 Each account on the supercomputer had a limit of 100Go which was not enough to
@@ -95,13 +95,16 @@ enough privileges, to allocate enough GPU VRAM.
 
 \item Constrained environment
 With the DGX-A100 cluster it was not possible to use Docker containers, and the
-installed CUDA version, in order to have more recent CUDA versions it was needed
-to use a NVidia CUDA container with the enroot command.
+installed CUDA version was too old to run some codes, in order to have more
+recent CUDA versions it was needed to use a NVidia CUDA container with the
+enroot command.
 
 \item Availability of the cluster
-Even though the cluster had two nodes, it could not handle too many tasks in the
-same time, making it impossible to use the cluster half of the time. 
+Even though the cluster had two nodes, it could not handle too many allocations
+in the same time, making it impossible to use the cluster half of the time
+because too many people were using it. 
 \end{itemize}
 
-However, the supercomputer system admin, Aman Iftekhar, was always very
-easy to reach, he helped a lot through the whole internship.
+The supercomputer system admin, Aman Iftekhar, was always very easy to reach, he
+helped a lot through the internship and teached helpful commands to use the
+cluster.

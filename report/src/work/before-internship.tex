@@ -1,0 +1,98 @@
+Before the internship it was asked to follow the online lectures of the CS231n
+course from Stanford University. Two of the three assignements were completed,
+they covered many aspects of machine learning: Image classification, kNN,
+Softmax, FC Neural Network, Fully Connected Networks, Batch Normalization,
+Dropout, CNNs, Network Visualization, RNNs. 
+
+The results of these two assignements will be presented here.
+
+\subsubsection{Assignment 1}
+
+The first assignement was mostly about implementing first elements of machine
+learning all from scratch, no pytorch was used.
+
+The Support Vector Machine (SVM) is one layer of a Neural Network without
+activation function, it was asked to implement one from scratch and train it.
+One exercice was to visualize the weights of the weight matrix after training a
+SVM on the CIFAR-10 dataset with cross validation and softmax loss, it gives a
+kind of average of the images of each class in \cref{fig:svm-visu}. The
+cross-validation was used to choose the learning rate and regularization
+strength hyperparameters, as shown in \cref{fig:cross-validation}.
+We achieve almost 40 percent with the SVM.
+
+\insertfigure
+    {assets/images/svm-visu}
+    {width=0.7\textwidth}
+    {Visualization of the SVM's weights after training}
+    {fig:svm-visu}
+
+\insertfigure
+    {assets/images/cross-validation}
+    {width=0.7\textwidth}
+    {Cross-validation to choose learning rate and regularization strength
+    parameters}
+    {fig:cross-validation}
+
+Then, a two layers neural network was implemented, all from scratch, including
+gradients calculus for backward propagation. ReLU activation functions were used
+and our fully working two layers neural network achieved 52 percent accuracy on
+the CIFAR-10 dataset. \cref{fig:twolayers-train} shows the training of it.
+\cref{fig:two-layers-visu} shows the visualization of the weights of the first
+layer, more abstract elements are learnt on this layer.
+
+\insertfigure
+    {assets/images/twolayers-train}
+    {width=0.7\textwidth}
+    {Training of the two layers model on CIFAR-10}
+    {fig:twolayers-train}
+
+\insertfigure
+    {assets/images/two-layers-visu}
+    {height=0.3\textheight}
+    {Visualization of the weight of a trained two layers model on CIFAR-10}
+    {fig:two-layers-visu}
+
+One exercice on feature extraction asked to extract the color histograms of the
+images and use that as an input to the classifier. This achieved a 58 percent
+accuracy on the test set.
+
+\subsubsection{Assignment 2}
+
+In this assignement, more advanced layers were implemented from scratch before
+moving to using PyTorch.
+
+At first Batch Normalization is implemented from scratch (with forward pass and
+backward pass), \cref{fig:batchnorm-efficiency} shows how it improves the
+training.
+
+\insertfigure
+    {assets/images/batchnorm-efficiency}
+    {height=0.3\textheight}
+    {Batchnormalization improving training speed}
+    {fig:batchnorm-efficiency}
+
+Then, the dropouts layer was implemented from scratch to prevent overfitting,
+\cref{fig:dropout} shows a less overfitting model with 0.25 dropout.
+
+\insertfigure
+    {assets/images/dropout}
+    {height=0.3\textheight}
+    {Batchnormalization improving training speed}
+    {fig:dropout}
+
+Finally, the last layer implemented from scratch is the convolution, spatial
+batch normalization and spatial group normalization layers (forward pass and
+backward pass included). The filters of the first layer of a CNN can be
+visualized \cref{fig:visu-cnn}, they correspond to some edges/textures
+detection.
+
+\insertfigure
+    {assets/images/visu-cnn}
+    {height=0.3\textheight}
+    {Visualization of the filters of the first layer of CNN trained on CIFAR-10}
+    {fig:visu-cnn}
+
+Finally, it was asked to use PyTorch, implementing a two-layers neural network
+in the PyTorch framework. A final task was to try and implement the best
+CIFAR-10 classifier. A 6 layers AlexNet like architecture showed 78 percent
+accuracy. 

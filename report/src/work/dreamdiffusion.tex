@@ -148,21 +148,21 @@ DreamDiffusion specified is that they took their data from the Mother of all BCI
 Benchmarks \cite{moabb} (MOABB) platform. A previous intern from 2024, Racim
 Menasria, had to reproduce DreamDiffusion. He choosed to use the
 GrosseWentrup2009 \cite{GrosseWentrup2009} and Schirrmeister2017
-\cite{Schirrmeister2017} datasets. In the process of reproducing what Racim did, I
-corrected an error in a dataset with a GitHub pull request
+\cite{Schirrmeister2017} datasets. In the process of reproducing what Racim did,
+an error was corrected in a dataset with a GitHub pull request
 \url{https://github.com/NeuroTechX/moabb/pull/781}. Not only the datasets used
 were hard to find but they were also very long to download as the server
 delivering them had internet limitations.
 
 Many little problems made the code work on the authors' machine but not on any
-other machine, those little issues were fixed and I proposed a pull request, but
-the authors did not answer
+other machine, those little issues were fixed and a pull request was proposed,
+but the authors did not answer
 \url{https://github.com/bbaaii/DreamDiffusion/pull/42}.
 
 At one time the goal was to try and improve DreamDiffusion with novels idea and
-I had to go through the whole code to begin with it. The code is taken from
-\cite{mindvis} so and the structure of the files and their roles was new to me
-so it also took a good amount of time to understand every bit.
+it was needed to go through the whole code to begin with it. The code is taken
+from \cite{mindvis} so and the structure of the files and their roles was new so
+it also took a good amount of time to understand every bit.
 
 \subsubsection{Results}
 
@@ -180,7 +180,7 @@ these are clownfish pictures, this is probably due to a not high enough
 coefficient to take into account the diffusion loss. This also explains why some
 images are incoherent.
 
-We can distinguish two common mistakes that happen in the 70 left percents. The
+We can distinguish two common mistakes that happen in the 70 percents left. The
 first one is when the generated image is coherent and looks like a real image,
 but from another class \cref{fig:dd-coherent}. The other mistake is when the
 generated image is not coherent, it's hard to understand what is shown

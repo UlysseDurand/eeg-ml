@@ -94,7 +94,6 @@
     \end{minipage}\\[4cm]
 
     \vfill
-    {\large \today\par}
 
   \end{titlepage}
   \clearpage

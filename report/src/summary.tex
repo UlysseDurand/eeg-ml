@@ -1,3 +1,35 @@
-This is a summary
+DreamDiffusion \cite{dreamdiffusion} a été le premier modèle de diffusion à
+apprendre à générer des images à partir d'électroencéphalogrammes (EEG). Le
+stage était axé sur la génération d'images conditionnée par les EEG, en
+reproduisant les résultats de DreamDiffusion et en explorant d'autres modèles
+accomplissant la même tâche mais avec des techniques nouvelles. En effet,
+DreamDiffusion produisait parfois des résultats incohérents ou semblait
+conditionné par la classe de l'image de référence plutôt que par ses éléments
+réels — une fidélité sémantique manquait, par exemple lorsqu'il générait une
+photo de chaise, mais d'un type très différent et dans un contexte tout autre.
+Une tentative a été faite pour proposer une nouvelle métrique destinée aux
+modèles de génération d'images à partir d'EEG, permettant de mieux mesurer la
+justesse sémantique de l'image générée. L'idée consiste à comparer l'image
+générée à l'image de référence en mesurant la cosine similarity entre les
+embeddings (issus de sBERT \cite{sbert}) des captioning (générées par BLIP2
+\cite{blip2} ou MiniCPM \cite{minicpm}) des deux images.  Ce travail n'a pas été
+achevé à la fin du stage mais a été poursuivi par de nouveaux stagiaires, et
+nous avons soumis un article à une conférence ne pouvant être nommée tant que le
+papier n'a pas été revu. 
 
-C'est un sommaire
+DreamDiffusion \cite{dreamdiffusion} was the first diffusion model that has
+learnt to generate images from Electroencephalograms (EEG). The internship
+focused on image generation conditioned by EEGs, replicating DreamDiffusion's
+results, going through other models that also perform the same task but with
+novel techniques.  Indeed, DreamDiffusion gave results that could sometimes be
+incoherent, or seemed to be conditioned by the class the ground truth image was
+from instead of the real elements of the ground truth, a semantic faithfulness
+of the image was lacking when it generated a photo of a chair but a very
+different chair in a very different context. An attempt was made at proposing a
+new metric for EEG to image generation models that better measured the semantic
+correctness of the generated image. The idea is to compare the generated image
+to the ground truth by comparing (cosine similarity) the embedding (from sBERT
+\cite{sbert}) of the caption (generated from BLIP2\cite{blip2} or
+MiniCPM\cite{minicpm}) of the images. This work was not finished by the end of
+the internship but continued later by new interns, and we submitted a paper to
+a conference which cannot be cited as the paper is not reviewed yet.

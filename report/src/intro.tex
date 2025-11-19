@@ -5,28 +5,34 @@ learning models to retrieve relevent information from the brain, together they
 help to predict epilepsy seizures, diagnose Parkinson disease, or control remote
 devices with mind \parencite{sahota2023}.
 
+The field of generative AI is growing very rapidly in the recent years and its
+usage for image as well as text is now very well known to the public.  This tool
+rapidly proved very promising usage in the neuroscience as it could be used to
+learn from our brain signals and produce images or texts, the big breakthrough
+in image generation from \cite{diffusion}. However, DreamDiffusion isn't
+semantically correct, during the internship it was attempted to propose a new
+metric for EEG to image generative models to measure their semantic fidelity.
+
 \insertfigure
     {assets/images/eeg-setup}
     {height=0.2\textheight}
-    {EEGcap}
+    {An EEG cap}
     {figeegsetup}
 
-\subsection{The internship}
+\subsection*{The internship}
 
-The internship took place in Hyderabad, Telangana, India, in Mahindra
-University (MU), under the supervision of Dr. Nidhi Goyal. It was in a team of
-researchers with Sai Amrit Patnaik AI Researcher at Tech5, Gaspard Lefort in
-internship from Centrale Méditéranée and Shankar Sai Ankit Reddy a bachelor
-student who volunteered.
+The internship aimed at evalutating the coherence and design metrics in EEG to
+image reconstruction models and submit a research publication. It took place in
+Hyderabad, Telangana, India, in Mahindra University (MU), under the supervision
+of Dr. Nidhi Goyal. It was in a team of researchers made of interns, researchers
+from both academics and industry, and one B.Tech volunteed.
 
 Before the internship it was asked to complete the
 \href{http://cs231n.stanford.edu}{CS231n} course "Deep Learning for Computer
 Vision" from Stanford University, all the lecture videos were watched but only 2
 assignements out of the 3 were completed. This course was given in 2017 at
-Stanford University and covered many topics like image classification,
-optimization, neural networks, CNNs, training techniques, TensorFlow, PyTorch,
-GoogleNet, ResNet, RNNs, Autoencoders, GANs, Deep Reinforcement Learning,
-Hardware for Machine Learning. The assignements were about implementing models
+Stanford University and covered many topics that went quite deeply into deep
+learning, images, generation. The assignements were about implementing models
 and training them from scratch.
 
 During the internship multiple events were attended.
@@ -39,13 +45,13 @@ Being a teaching assistant for two practicals on Natural Language Processing
 issues they had and answer their questions.
 
 \item
-Attending \href{https://www.mahindrauniversity.edu.in/gaiih-2025/}{GAIIH2025} a
-3 days summer school on Generative AI for Healthcare, this completed. Many
-lectures explained quite deeply some machine learning concepts, with hands-on
-sessions to implement them from scratch. The topics it covered were very recent
-like Diffusion models, Stable Diffusion, GANs, LLMs, Prompt Engineering, RNNs,
-Transformers, Visual Transformers, AutoEncoders, U-Nets, LORA, Multimodal
-Models.
+Attending the Generative AI for Image Processing and Healthcare
+(GAIIH2025)\cite{gaiih2025} a 3 days summer school on Generative AI for
+Healthcare, this completed. Many lectures explained quite deeply some machine
+learning concepts, with hands-on sessions to implement them from scratch. The
+topics it covered were very recent like Diffusion models, Stable Diffusion,
+GANs, LLMs, Prompt Engineering, RNNs, Transformers, Visual Transformers,
+AutoEncoders, U-Nets, LORA, Multimodal Models.
 
 \item
 A 2 days workshop by NVidia was attended, going through the different tools that
@@ -53,21 +59,20 @@ are useful for Machine Learning researchers. They showed how to use their DGX
 cluster and run some models and pipelines.
 \end{itemize}
 
-For the internship, an access to the University's NVidia DGX cluster was given,
-two NVIDIA A100 GPUS with 40GB of VRAM were available. Learning how to use it
-and paralellize work on the two GPUs took some time.
+For the internship, an access to the University's supercomputer, a NVidia
+DGX-A100 cluster was given. Learning how to use it and paralellize work on the
+two GPUs took some time.
 
 One goal of the internship was to try to publish a research paper in a A/A*
 conference (NeurIPS, WACV or AAAI). At the end of the internship the paper
-wasn't mature enough to be published so two new interns in MU, namely Sukriti
-Tiwari and Subrahmanyam B H V S P, continued the project still with the help of
-Sai Ankit Reddy, Dr Nidhi Goyal and Dr Sai Amrit Patnaik. We organized
-videoconferences to discuss the direction of the paper and the experiments that
-had to be conducted.  It resulted in submitting the paper in ICASSP 2026, today
-it is still in the reviewing process.
+wasn't mature enough to be published so two new interns in MU continued the
+project, still with the help of Sai Ankit Reddy, Dr Nidhi Goyal and Dr Sai Amrit
+Patnaik. We organized videoconferences to discuss the direction of the paper and
+the experiments that had to be conducted.  It resulted in submitting the paper
+in a conference where it is today still under review.
 
-There was also a side project mixing optometry, neuroscience and data science I
-was involved in together with Gaspard Lefort, lead by Dr Shiva Ram Reddy from
-University of Hyderabad (UoH) , Dr Sunder Bukya and Dr Nidhi Goyal both from MU.
-It was about monitoring the attention of subjects when driving in a simulator
-with external disturbances.
+During the course of the internship there was also a side project mixing
+optometry, neuroscience and data science I was involved in together with Gaspard
+Lefort, lead by Dr Shiva Ram Reddy from University of Hyderabad (UoH) , Dr
+Sunder Bukya and Dr Nidhi Goyal both from MU.  It was about studying distracted
+driving behaviours among indian adults.
