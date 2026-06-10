@@ -3,7 +3,4 @@ position: Research Intern
 start_date: 2025-04
 end_date: 2025-07
 location: Hyderabad, India
-summary: 'Research on EEG-conditioned Image generation models, running experiments, proposing a new metric, leading to a paper submission'
-repository: 'https://gitlab.com/ulysse_durand/eeg-ml'
 report: 'https://gitlab.com/ulysse_durand/eeg-ml/-/raw/main/report/main.pdf'
-img: 'https://gitlab.com/ulysse_durand/eeg-ml/-/raw/main/thumbnail.png'
