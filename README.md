@@ -2,6 +2,8 @@
 
 This is the internship subject of Ulysse Durand, at Mahindra University, Hyderabad, India, from 21/4/25 to 19/7/25, under the supervision of Dr Nidhi Goyal.
 
+The present work was continued and published to [HBAI 2026](https://hbai2026.github.io/): https://arxiv.org/pdf/2607.12364.
+
 ## Folders structure
 
 - `Report` : The report of the project
